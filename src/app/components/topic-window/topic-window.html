@@ -1,0 +1,97 @@
+<div class="row flex-fill  px-3 mx-0 h-100">
+  <div class="col-12  justify-content-start align-items-top pt-4 px-0">
+    @if (topic() === null) { 
+        Loading... 
+    }
+    @else  { 
+
+       <div class="row h-100 d-flex justify-content-start align-items-top">
+         <div class="col-12 col-lg-10 d-flex flex-column">
+            <div class="row">
+                <div class="col d-flex flex-column align-items-start" >
+                    <div class="d-flex flex-row justify-content-start w-100" >
+                        <div class="d-flex flex-column justify-content-center pe-2">
+                            <h3>Reply URL</h3>
+                        </div>
+                        <div class="d-flex flex-column justify-content-center w-75">
+                            <input 
+                              #codeInput 
+                              type="text" 
+                              value="{{ replyUrl() }}" 
+                              disabled 
+                            />
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                           <button mat-icon-button 
+                              (click)="copyText()" 
+                              aria-label="Copy">
+                              <mat-icon>content_copy</mat-icon>
+                           </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+               <div class="col col-lg-10">
+                  <h1  class="text-center">{{ topic()?.decryptedData?.title }}</h1>
+                  <p class="px-5 fs-5">{{ topic()?.decryptedData?.description }}</p>
+               </div>
+            </div>
+            <div class="row flex-grow-1 mx-0 mt-4">
+             <!---->
+               <div class="col-12  d-flex flex-column px-0" style="height: calc(100vh - 290px);">
+                   <!--
+                   @if ( decryptedReplies() !== null) { 
+                    -->
+                   <app-topic-reply-list 
+                       [(decryptedReplies)]="decryptedReplies" 
+                       [loadingReplies]="loadingReplies()"
+                       [commentAction]="true"
+                       (endOfScrollOut)="handleEndOfScroll($event)"    
+                    >
+                    </app-topic-reply-list>
+                    <!--
+                   }
+                     -->
+               </div>
+            </div>
+         </div>
+       </div>
+
+
+    }
+    <!--
+    <form class="topic-form" [formGroup]="topicForm" (ngSubmit)="onSubmit()">
+      <mat-form-field class="topic-full-width">
+        <mat-label>Topic</mat-label>
+        <input  matInput formControlName="subject" [errorStateMatcher]="matcher"
+               placeholder="Ex. My secret messages">
+        @if (topicForm.get('subject')?.hasError('required')) {
+          <mat-error>Topic is <strong>required</strong></mat-error>
+        }
+      </mat-form-field>
+
+i      <mat-form-field class="topic-full-width">
+         <mat-label>Description</mat-label>
+         <textarea 
+            matInput 
+            placeholder="Ex. Heres some notes about this"
+            rows="8" 
+            formControlName="description"
+            [errorStateMatcher]="matcher"
+         >
+
+         </textarea>
+       </mat-form-field>
+
+        <div class="row">
+            <div class="col d-flex flex-fill justify-content-center">
+              <button mat-raised-button color="primary" type="submit" [disabled]="topicForm.invalid">
+                Submit
+              </button>
+           </div>
+        </div>
+    </form>
+    -->
+  </div>
+</div>

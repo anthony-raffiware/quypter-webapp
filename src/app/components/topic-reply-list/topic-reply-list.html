@@ -1,0 +1,123 @@
+<div #scrollContainer class="qc-scrollable-box" (scroll)="onDivScroll($event)">
+@if ( decryptedReplies() === null) { 
+    Loading... 
+}
+@else  {
+
+    @for (reply of decryptedReplies(); track reply.id) {
+    <div class="row mx-0 w-100 mb-5">
+        <div class="col d-flex justify-content-start px-0">
+            <div class="d-flex flex-row flex-grow-1">
+                <mat-card class="reply-card" appearance="outlined">
+                    <mat-card-header class="reply-card-header" >
+                        @if (showIdenticon()) {
+                        <div class="py-0 pe-2" title="{{reply.session_key_id}}">
+                            <svg 
+                               data-jdenticon-value="{{reply.session_key_id}}" 
+                               width="30" 
+                               height="30"
+                               role="img"
+                               aria-labelledby="{{reply.session_key_id}}"
+                            >
+                                <title>
+                                 {{reply.session_key_id}}
+                                </title>
+                            </svg>
+                        </div>
+                        }
+                      <div class="d-flex flex-column  align-items-center justify-content-center">
+                        <div>
+                        {{ reply.localCreatedDateTime }}
+                        </div>
+                      </div>
+                    </mat-card-header>
+                    <mat-card-content>
+                        @if ( reply.decryptedData?.type == 'text' ) {
+                        <p>{{  reply.getMessageData().message }}</p>
+                        }
+                        @else if ( reply.decryptedData?.type == 'image' ) {
+                            @let imageData =reply.getImageData();
+                            <div class="px-3">
+                                <img 
+                                   [src]="imageData.thumb" 
+                                   (click)="openViewImageDialog(imageData, $event )"
+                                   alt="Binary Image" 
+                                />
+                                @if (imageData.caption) {
+                                  <p class="fst-italic my-0">{{ imageData.caption }}</p>
+                                }
+                            </div>
+                        }
+                    </mat-card-content>
+
+                    <mat-card-footer class="reply-card-footer">
+                        <hr class="mb-0"/>
+                    @if ( commentAction() ) {
+                        <mat-card-actions align="end" class="py-0">
+                            @if ( addingComment() != reply.id) {
+                                @if ( !reply.comment) {
+                                <button (click)="addComment(reply.id)" matButton>Add Comment</button>
+                                }
+                                @else {
+                                <button (click)="editComment(reply)" matButton>Edit Comment</button>
+                                }
+                            }
+                            @else if ( addingComment() == reply.id ) {
+                            <button (click)="submitComment(reply)" matButton>Submit</button>
+                            <button (click)="cancelComment()" matButton>Cancel</button>
+                            }
+                        </mat-card-actions>
+                    }
+                    @if ( addingComment() == reply.id ) {
+                        <form  [formGroup]="commentForm">
+                            <div class="d-flex flex-row justify-content-center flex-grow-1">
+                            <mat-form-field class="reply-comment">
+                                <mat-label>Comment</mat-label>
+                                <textarea 
+                                   matInput 
+                                   placeholder="Ex. wow cool!"
+                                   rows="2" 
+                                   formControlName="comment"
+                                   [errorStateMatcher]="matcher"
+                                >
+
+                              </textarea>
+                            </mat-form-field>
+                            </div>
+                        </form>
+                    }
+                    @if ( reply.comment && ( addingComment() != reply.id ) ) {
+                        <div class="d-flex flex-row flex-grow-1 p-2 fst-italic align-items-center">
+                            @if (!showIdenticon()) {
+                            <div class="py-0 pe-2" title="{{reply.comment.session_key_id}}">
+                                <svg 
+                                   data-jdenticon-value="{{reply.comment.session_key_id}}" 
+                                   width="30" 
+                                   height="30"
+                                   role="img"
+                                   aria-labelledby="{{reply.comment.session_key_id}}"
+                                >
+                                    <title>
+                                     {{reply.comment.session_key_id}}
+                                    </title>
+                                </svg>
+                            </div>
+                            }
+
+                            {{ reply.comment.localUpdatedDateTime }}:
+                            {{ reply.comment.decryptedData?.comment }}
+                        </div>
+                    }
+                    </mat-card-footer>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+    }
+    @if ( loadingReplies() ) { 
+    <div class="d-flex flex-row justify-content-center">
+        <mat-spinner></mat-spinner>
+    </div>
+    }
+}
+</div>

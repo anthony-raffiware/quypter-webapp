@@ -1,0 +1,10 @@
+:host {
+  height: inherit;
+  display: block;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+svg {
+  flex: none;
+}

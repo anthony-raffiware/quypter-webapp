@@ -1,0 +1,40 @@
+:host {
+  height: 100%;
+}
+
+.message-reply-form {
+  min-width: 150px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.topic-full-width {
+  width: 100%;
+}
+
+.reply-card {
+  min-width: 600px;
+  max-width: 600px;
+  font-size: 18px !important;
+}
+
+.reply-card-header {
+  justify-content: flex-end;
+  font-size: 15px !important;
+}
+
+@media (min-height: 800px) {
+  .qc-scrollable-box {
+    height: 60vh !important; /* 50% of viewport height */
+  }
+}
+
+
+.qc-scrollable-box {
+  height: 50vh; /* 50% of viewport height */
+  overflow-y: auto; 
+  // position: relative;
+  // top: 20px; /* Offset from bottom */
+  // bottom: 20px; /* Offset from bottom */
+  // overflow-y: auto;
+}

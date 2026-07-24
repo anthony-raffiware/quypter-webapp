@@ -1,0 +1,139 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+//@import "bootstrap/dist/css/bootstrap-grid.min.css";
+
+// module system apparently not supported until v6
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/maps"; 
+//@use "bootstrap/scss/root";
+// Optional
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/utilities/api";
+// @import "bootstrap/scss/reboot";
+
+.mat-primary {
+  color: #ffffff; /* Replace with your desired color */
+}
+
+$custom-foreground: (
+//  status-bar: black,
+//  app-bar:       black,
+//  background:    #e0e0e0,
+//  hover:         rgba(0,0,0,0.04),
+//  card:          black,
+//  dialog:        black,
+//  disabled:      rgba(0,0,0,0.38),
+//  divider:       rgba(0,0,0,0.12),
+//  btn-text:      black,
+//  icon:          rgba(0,0,0,0.54),
+//  icons:         rgba(0,0,0,0.54),
+  text:           rgb(250, 243, 243), // This controls primary text color
+  link:           #ffffff,
+  link-decorated: #ffffff,
+//  button:        black,
+//  hover-state:   rgba(0,0,0,0.04),
+);
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: dark;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  //background-color: var(--mat-sys-surface);
+  background: var(--active-nav-color);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
+/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary-bg-color: #292929;
+  --secondary-bg-color: #313943;
+  --active-window-color: #6d757d;
+  --primary-text-color: #e2e2e2;
+  --primary-form-color: #343637;
+  --active-nav-color: #3b4e66;
+}
+
+.bg_primary {
+  background: var(--primary-bg-color);
+}
+
+.bg_secondary {
+  background: var(--secondary-bg-color);
+}
+
+// body {
+//   margin: 0 !important;
+//   padding: 0 !important;
+//   height: 100%;
+// }
+
+$header-height: 70px;
+$footer-height: 70px;
+
+$main-height-offset: $header-height; //15 ; // $footer-height;
+
+.qc_header {
+  background: var(--active-nav-color);
+  margin-left: 0px;
+  margin-right: 0px;
+//  max-width: 100% !important;
+  padding-top: 0px; //1em;
+  height: $header-height
+}
+
+div.gc-main {
+  height: calc(100vh - #{$main-height-offset});
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+
+}
+
+
+.qc_footer {
+  background: var(--active-nav-color) !important;
+  margin-left: 0px;
+  margin-right: 0px;
+//  max-width: 100% !important;
+  padding-top: 1em;
+  height: $footer-height
+}
+
+.custom-image-dialog-panel .mdc-dialog__content {
+   height: 100%;
+   max-height: 100%;
+}

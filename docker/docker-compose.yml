@@ -1,0 +1,12 @@
+name: quick-crypt-webapp
+services:
+  angular-build:
+    build:
+      context: ..
+      target: build
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./dist:/app/dist
+      # Don't write modules back to host
+      - /app/node_modules
+    command: ["ng", "build", "--configuration=production", "--output-path=/app/dist"]

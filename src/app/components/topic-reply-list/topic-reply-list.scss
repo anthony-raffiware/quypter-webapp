@@ -1,0 +1,46 @@
+:host {
+  height: inherit;
+}
+
+.reply-card {
+  // min-width: 600px;
+  // max-width: 600px;
+  //min-width: 100%;
+  //max-width: 100%;
+  flex-grow: 1;
+
+  font-size: 18px !important;
+}
+
+.reply-card-header {
+  justify-content: flex-end;
+  font-size: 15px !important;
+}
+
+.reply-card-footer {
+    padding: 10px;
+}
+
+.reply-comment {
+    width: 90%;
+}
+
+//@media (min-height: 800px) {
+//  .qc-scrollable-box {
+//    height: 65vh !important; /* 50% of viewport height */
+//  }
+//}
+
+.qc-scrollable-box {
+  //height: 55vh; /* 50% of viewport height */
+  height: inherit;
+  flex: 1; /* Take up remaining space */
+  min-height: 0;
+  overflow-y: auto; 
+  scrollbar-gutter: stable;
+
+  // position: relative;
+  // top: 20px; /* Offset from bottom */
+  // bottom: 20px; /* Offset from bottom */
+  // overflow-y: auto;
+}

@@ -1,0 +1,13 @@
+.qc-full-image {
+   width: 100%;
+   max-width: 100%;
+   height: 100%;
+   max-height: 100% !important;
+   overflow: auto;
+}
+
+::ng-deep .mat-mtc-dialog-content {
+  overflow: auto;
+  height: 100%;
+  max-height: 100% !important;
+}

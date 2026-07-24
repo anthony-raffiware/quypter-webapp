@@ -1,0 +1,40 @@
+<div class="row flex-fill  px-3 mx-0 h-100">
+  <div class="col-12 d-flex  flex-fill justify-content-center align-items-center px-0">
+    <form class="topic-form" [formGroup]="topicForm" (ngSubmit)="onSubmit()">
+      <mat-form-field class="topic-full-width">
+        <mat-label>Topic</mat-label>
+        <input  matInput formControlName="subject" [errorStateMatcher]="matcher"
+               placeholder="Ex. My secret messages">
+        @if (topicForm.get('subject')?.hasError('required')) {
+          <mat-error>Topic is <strong>required</strong></mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field class="topic-full-width">
+         <mat-label>Description</mat-label>
+         <textarea 
+            matInput 
+            placeholder="Ex. Heres some notes about this"
+            rows="8" 
+            formControlName="description"
+            [errorStateMatcher]="matcher"
+         >
+
+         </textarea>
+       </mat-form-field>
+
+        <div class="row">
+            <div class="col d-flex flex-fill justify-content-center">
+              <button 
+                 matButton="outlined"
+                 type="submit" 
+                 [disabled]="topicForm.invalid"
+              >
+                 Create 
+              </button>
+
+           </div>
+        </div>
+    </form>
+  </div>
+</div>

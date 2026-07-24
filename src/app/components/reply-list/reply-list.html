@@ -1,0 +1,36 @@
+@if (topicService.replies.value() === null) { 
+    Loading... 
+}
+@else  { 
+
+<mat-nav-list>
+    @for (topic of topicService.replies.value()?.data?.collection; track topic.id) {
+        <a
+          mat-list-item
+
+          [routerLink]="['/reply', topic.id  ]"
+          routerLinkActive
+          #rla="routerLinkActive"
+          [activated]="rla.isActive" 
+        >
+        <!--
+        <canvas width="40" height="40" data-jdenticon-value="icon value"></canvas>
+         -->
+            <div 
+               class="d-flex flex-row justify-content-end pe-4"
+               title="{{topic.id}}"
+            >
+                <svg 
+                   data-jdenticon-value="{{topic.id}}" 
+                   width="30" 
+                   height="30"
+                   role="img"
+                   aria-labelledby="{{topic.id}}"
+                >
+                   {{topic.id}}
+                </svg>
+            </div>
+        </a>
+    }
+</mat-nav-list>
+}

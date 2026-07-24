@@ -1,0 +1,192 @@
+import { 
+    Component, 
+    input, 
+    output, 
+    inject, 
+    signal, 
+    effect,
+    computed,
+    debounced,
+    ViewChild, 
+    ElementRef,
+    ChangeDetectorRef,
+    model, 
+} from '@angular/core';
+import {
+  FormGroup,
+  FormBuilder,
+  FormControl,
+  FormGroupDirective,
+  NgForm,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { switchMap, from } from 'rxjs';
+
+import { ImageReply } from '../../shared/models/topic-reply.model';
+import { ImageView } from '../image-view/image-view';
+import {MatCardModule} from '@angular/material/card';
+import {MatInputModule} from '@angular/material/input';
+import {MatButtonModule} from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
+import { TopicReply } from '../../shared/models/topic-reply.model';
+import { NgxJdenticonModule } from 'ngx-jdenticon';
+import { ReplyComment, NewReplyComment, ReplyCommentData } from '../../shared/models/reply-comment.model';
+import { getUtc } from '../../shared/utils';
+import { SessionService } from '../../shared/services/session';
+import { TopicService } from '../../shared/services/topic';
+import { QCErrorStateMatcher } from '../../shared/utils';
+
+
+@Component({
+  selector: 'app-topic-reply-list',
+  imports: [
+    FormsModule, 
+    ReactiveFormsModule,
+    MatButtonModule, 
+    MatCardModule,
+    MatFormFieldModule, 
+    MatProgressSpinnerModule,
+    MatInputModule, 
+    NgxJdenticonModule
+  ],
+  templateUrl: './topic-reply-list.html',
+  styleUrl: './topic-reply-list.scss',
+})
+export class TopicReplyList {
+
+    public  dialog         = inject(MatDialog);
+    private sessionService = inject(SessionService);
+    private topicService = inject(TopicService);
+
+
+    @ViewChild('scrollContainer') scrollContainer!: ElementRef;
+
+    public decryptedReplies = model.required<Array<TopicReply>>();
+    public loadingReplies   = input.required<boolean>();
+    public showIdenticon    = input<boolean>(true);
+    public commentAction    = input<boolean>(false);
+
+    public endOfScrollOut = output<Event>();
+
+    public sessionId      = computed(() => this.sessionService.session().id );
+    public  addingComment = signal<string|null>(null)
+    private endOfScroll   = signal<Event|null>(null)
+    private debouncedEndOfScroll = debounced(() => this.endOfScroll(), 500);
+
+    public matcher = new QCErrorStateMatcher();
+    public commentForm!: FormGroup;
+
+    constructor(
+        private cdr: ChangeDetectorRef
+    ) {
+
+        this.commentForm = new FormBuilder().group({
+            comment: ['', [Validators.required ] ],
+        });
+
+        effect( () => {
+            const scrollEvent = this.debouncedEndOfScroll.value();
+
+            if (scrollEvent !== null ) {
+                this.endOfScrollOut.emit(scrollEvent)
+            }
+        })
+            
+    }
+
+    get cf(): FormGroup { return this.commentForm; }
+
+    openViewImageDialog( imageReply: ImageReply, event: Event): void {
+
+        const imageDialogRef = this.dialog.open(ImageView, {
+          data: { imageData: imageReply.data },
+          width: '100%',
+          maxWidth: '100%',
+          height: '90%',
+          panelClass: 'custom-image-dialog-panel'
+        });
+
+    }
+    
+    onDivScroll(event: any) {
+
+        const element = event.target;
+      
+        if ( (element.scrollTop > 0 )
+          && (element.offsetHeight + element.scrollTop >= element.scrollHeight)
+        ) {
+            this.endOfScroll.set(event)
+      }
+    }
+
+    addComment(replyId: string) {
+        this.addingComment.set(replyId)
+    }
+
+    editComment(reply: TopicReply) {
+        this.cf.get('comment')?.setValue(reply.comment?.decryptedData?.comment);
+        this.addingComment.set(reply.id)
+    }
+
+    cancelComment() {
+        this.addingComment.set(null)
+    }
+
+    submitComment(reply: TopicReply ) {
+
+        if (this.cf.invalid) {
+           return;
+        }
+
+        const formVals = this.cf.value;
+        const newComment = new NewReplyComment({ 
+                              topic_reply_id: this.addingComment() as string
+                           });
+
+        newComment.decryptedData = {
+            comment: formVals.comment,
+            updated: getUtc() 
+        }
+
+        this.sessionService.isSessionLoaded()
+            .pipe(
+                switchMap( (loaded) => {
+                    console.log(loaded)
+
+                    return from(this.topicService.createReplyComment(newComment))  
+                        .pipe( switchMap( (s) => { return s }))
+                })
+            )
+            .subscribe({
+                next: (commentResp) => {
+                    console.log(commentResp) 
+                    this.cf.markAsUntouched();
+                    this.cf.setErrors(null);
+                    this.cf.reset();
+                    this.cf.get('comment')?.setErrors(null);
+                    this.addingComment.set(null);
+                    reply.comment = new ReplyComment(commentResp.data);
+                    reply.comment.decryptedData = {
+                        comment: formVals.comment,
+                        updated: getUtc() 
+                    }
+
+                    this.decryptedReplies.update(replies => 
+                        replies.map(curReply => 
+                          curReply.id === reply.id ? reply : curReply 
+                        )
+                    );
+
+                    //this.cdr.detectChanges();
+                },
+                error: (error) => {
+                    console.error('Topics Request failed', error.error);
+                }
+            })
+
+    }
+}
