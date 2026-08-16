@@ -6,7 +6,7 @@ services:
       target: build
       dockerfile: docker/Dockerfile
     volumes:
-      - ./dist:/app/dist
+      - ../dist:/app/dist
       # Don't write modules back to host
       - /app/node_modules
     command: ["ng", "build", "--configuration=production", "--output-path=/app/dist"]
