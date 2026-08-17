@@ -81,7 +81,14 @@
   <mat-dialog-actions>
     <mat-button-toggle-group [disabled]="loadingImage()">
       <button matButton (click)="onNoClick()">Cancel</button>
-      <button matButton [mat-dialog-close]="returnData()" cdkFocusInitial>Send</button>
+        <button 
+           matButton 
+           [mat-dialog-close]="returnData()" 
+           cdkFocusInitial
+           [disabled]="disableSendButton()"
+        >
+        Send
+        </button>
     </mat-button-toggle-group>
   </mat-dialog-actions>
 </div>

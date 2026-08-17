@@ -149,7 +149,6 @@ export class AddReplyImage {
     }
 
     onFileSelected($event: Event) {
-        //console.log('select', $event)
 
         const target = $event.target as HTMLInputElement;
 
@@ -265,6 +264,12 @@ export class AddReplyImage {
 
     onFileSelectCancel($event: Event) {
         this.loadingImage.set(false)
-        //console.log(this.loadingImage())
+    }
+
+    disableSendButton() {
+        const ret = !this.imageData()  || this.loadingImage()  || !!this.imageError()
+
+        console.log('checking', ret)
+        return ret
     }
 }
