@@ -9,4 +9,4 @@ services:
       - ../dist:/app/dist
       # Don't write modules back to host
       - /app/node_modules
-    command: ["ng", "build", "--configuration=production", "--output-path=/app/dist"]
+    command: ["ng", "build", "--base-href=/quickcrypt/", "--configuration=production", "--output-path=/app/dist"]
