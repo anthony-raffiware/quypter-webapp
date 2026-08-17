@@ -31,10 +31,10 @@ export type TopicReplies = Array<TopicReplyData>
 @Component({
   selector: 'app-reply-window',
   imports: [
-    FormsModule, 
-    MatButtonModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
+    FormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
     ReactiveFormsModule,
     MatCardModule,
     TopicReplyList
@@ -66,14 +66,14 @@ export class ReplyWindow {
     private replyLastTs = signal<string|null>(null);
 
     topicResource = rxResource({
-        params: () => ({ 
+        params: () => ({
             sessionId: this.sessionId(),
             topicId: this.topicUuid(),
             replyLimit: this.replyLimit(),
             replyLastId: this.replyLastId(),
             replyLastTs: this.replyLastTs()
         }),
-        stream: ({ params }) => { 
+        stream: ({ params }) => {
 
             if (!params.sessionId) {
                 return of(undefined);
@@ -81,23 +81,23 @@ export class ReplyWindow {
 
             this.loadingReplies.set(true)
 
-            const hasCursor = params.replyLastId && params.replyLastTs; 
+            const hasCursor = params.replyLastId && params.replyLastTs;
 
             const options = {
-                params: { 
+                params: {
                     limit: params.replyLimit,
-                    ...(hasCursor && { 
+                    ...(hasCursor && {
                     key_id: params.replyLastId as string,
-                    key_ts: params.replyLastTs as string 
+                    key_ts: params.replyLastTs as string
                     })
                 }
             }
 
             return this.topicService.fetchTopicWithSentReplies(
-                params.sessionId, 
-                params.topicId, 
-                options 
-            ) 
+                params.sessionId,
+                params.topicId,
+                options
+            )
         }
     });
 
@@ -119,9 +119,9 @@ export class ReplyWindow {
 
             if ( this.topic() && ( this.topicUuid() != this.topic()?.id ) ) {
                 this.decryptedReplies.set([])
-                this.replyLimit.set(5) 
-                this.replyLastId.set(null) 
-                this.replyLastTs.set(null)                 
+                this.replyLimit.set(5)
+                this.replyLastId.set(null)
+                this.replyLastTs.set(null)
             }
         })
 
@@ -144,9 +144,9 @@ export class ReplyWindow {
                 })
 
                 Promise.all(promises as Promise<TopicReply>[] ).then((decrypted) => {
-                    
-                    this.decryptedReplies.update( results => { 
-                       return [...results, ...decrypted]; 
+
+                    this.decryptedReplies.update( results => {
+                       return [...results, ...decrypted];
                     })
                 })
             }
@@ -159,9 +159,9 @@ export class ReplyWindow {
         const last = this.decryptedReplies().at(-1);
 
         if ( last !== undefined ) {
-            this.replyLimit.set(3) 
-            this.replyLastId.set(last.id) 
-            this.replyLastTs.set(last.created_ts)                 
+            this.replyLimit.set(3)
+            this.replyLastId.set(last.id)
+            this.replyLastTs.set(last.created_ts)
         }
 
     }
@@ -175,7 +175,7 @@ export class ReplyWindow {
         });
 
         dialogRef.afterClosed().subscribe(result => {
-          
+
             if (result !== undefined) {
                 this.addReplyImage(result)
             }
@@ -214,7 +214,7 @@ export class ReplyWindow {
 
         const replyData: TopicReplyData = {
             type: 'image',
-            data: replyImage        
+            data: replyImage
         }
 
         this.addTopicReply(replyData);
@@ -223,30 +223,32 @@ export class ReplyWindow {
     addTopicReply(replyData: TopicReplyData) {
 
         const newTopicReply = new NewTopicReply();
-        newTopicReply.data = replyData; 
+        newTopicReply.data = replyData;
+
+        console.log('reply', this.sessionService.sessionLoaded$.value)
 
         this.sessionService.isSessionLoaded()
             .pipe(
                 switchMap( (loaded) => {
-                    
+
                     const topic = this.topic() as Topic;
 
                     newTopicReply.session_key_id = this.sessionService.sessionKeyId as string
 
-                    return from(this.topicService.createTopicReply(topic, newTopicReply))  
+                    return from(this.topicService.createTopicReply(topic, newTopicReply))
                         .pipe( switchMap( (s) => { return s }))
                 })
             )
             .subscribe({
                 next: (replyResp) => {
-                    
+
                     this.mrf.markAsUntouched();
                     this.mrf.setErrors(null);
                     this.mrf.reset()
                     this.mrf.get('messageData')?.setErrors(null);
                     this.decryptedReplies.set([])
-                    this.replyLastId.set(null) 
-                    this.replyLastTs.set(null)                 
+                    this.replyLastId.set(null)
+                    this.replyLastTs.set(null)
                     this.topicResource.reload()
                 },
                 error: (error) => {
