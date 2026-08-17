@@ -45,8 +45,7 @@ export class SessionService {
         this.session$ = new BehaviorSubject<SessionData>({});
 
         this.session = toSignal(this.session$, { 
-          //initialValue: {}, 
-          requireSync: true 
+            requireSync: true 
         });
 
 
@@ -62,11 +61,11 @@ export class SessionService {
             this.checkSession( sessionData.id as string )
                 .subscribe({
                     next: (response) => {
-                       this.sessionData = sessionData;
+                        this.sessionData = sessionData;
 
-                       this.sessionLoaded$.next(true);
-                       this.session$.next(sessionData);
-                       console.log('found session') 
+                        this.sessionLoaded$.next(true);
+                        this.session$.next(sessionData);
+                        console.log('found session') 
                     },
                     error: (error: HttpErrorResponse) => {
                         console.log('session error');
@@ -113,6 +112,7 @@ export class SessionService {
                 this.sessionData.created_ts = response.data.key_id
 
                 this.sessionLoaded$.next(true);
+                this.session$.next(this.sessionData)
 
                 this.saveLocalSessionData()
             });

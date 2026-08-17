@@ -2,14 +2,10 @@ import { Component, input, effect, signal, inject, computed, model } from '@angu
 import {
   FormGroup,
   FormBuilder,
-  FormControl,
-  FormGroupDirective,
-  NgForm,
   Validators,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import {ErrorStateMatcher} from '@angular/material/core';
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -51,7 +47,7 @@ export class ReplyWindow {
     public sessionService = inject(SessionService);
     public topicService   = inject(TopicService);
     public topicUuid      = input.required<string>();
-    public dialog       = inject(MatDialog);
+    public dialog         = inject(MatDialog);
 
     public sessionId        = computed(() => this.sessionService.session().id );
     public topic            = signal<TopicWithReplies|null>(null);
@@ -71,7 +67,7 @@ export class ReplyWindow {
 
     topicResource = rxResource({
         params: () => ({ 
-            sessionId: this.sessionId() as string,
+            sessionId: this.sessionId(),
             topicId: this.topicUuid(),
             replyLimit: this.replyLimit(),
             replyLastId: this.replyLastId(),
@@ -80,7 +76,7 @@ export class ReplyWindow {
         stream: ({ params }) => { 
 
             if (!params.sessionId) {
-              return of(undefined);
+                return of(undefined);
             }
 
             this.loadingReplies.set(true)
@@ -97,11 +93,11 @@ export class ReplyWindow {
                 }
             }
 
-
             return this.topicService.fetchTopicWithSentReplies(
                 params.sessionId, 
                 params.topicId, 
-                options ) 
+                options 
+            ) 
         }
     });
 
@@ -114,7 +110,7 @@ export class ReplyWindow {
     ) {
 
         this.messageReplyForm = new FormBuilder().group({
-          messageData: ['', [Validators.required ] ],
+            messageData: ['', [Validators.required]],
         });
 
         effect( () => {
@@ -135,8 +131,6 @@ export class ReplyWindow {
 
             if ( topicReplies !== undefined ) {
 
-                console.log(this.topicResource.value())
-
                 this.topic.set(topicReplies.data as TopicWithReplies)
 
                 const replies = this.topic()?.replies as Array<TopicReply>
@@ -154,7 +148,6 @@ export class ReplyWindow {
                     this.decryptedReplies.update( results => { 
                        return [...results, ...decrypted]; 
                     })
-
                 })
             }
         })
@@ -162,7 +155,6 @@ export class ReplyWindow {
     }
 
     handleEndOfScroll(event: Event ): void {
-        console.log('in parent', event) 
 
         const last = this.decryptedReplies().at(-1);
 
@@ -178,8 +170,6 @@ export class ReplyWindow {
 
         event.preventDefault();
 
-        //console.log('bb', this.imageData())
-
         const dialogRef = this.dialog.open(AddReplyImage, {
           data: { imageData: this.imageData(), imageType: this.imageType() },
         });
@@ -187,9 +177,7 @@ export class ReplyWindow {
         dialogRef.afterClosed().subscribe(result => {
           
             if (result !== undefined) {
-              //console.log(result)
-              //this.imageData.set(result);
-              this.addReplyImage(result)
+                this.addReplyImage(result)
             }
         });
     }
@@ -197,9 +185,9 @@ export class ReplyWindow {
     openViewImageDialog( imageReply: ImageReply, event: Event): void {
 
         const imageDialogRef = this.dialog.open(ImageView, {
-          data: { imageData: imageReply.data },
-          width: '100%', // Ensures the container uses the available width
-          maxWidth: '100%' // Opt
+            data: { imageData: imageReply.data },
+            width: '100%',
+            maxWidth: '100%'
         });
 
     }
@@ -207,7 +195,7 @@ export class ReplyWindow {
     onMessageSubmit() {
 
         if (this.mrf.invalid || this.topic() === null ) {
-           return;
+            return;
         }
 
         const formVals = this.mrf.value;
@@ -223,7 +211,6 @@ export class ReplyWindow {
     }
 
     addReplyImage( replyImage: ImageReply ) {
-        console.log(replyImage)
 
         const replyData: TopicReplyData = {
             type: 'image',
@@ -241,7 +228,7 @@ export class ReplyWindow {
         this.sessionService.isSessionLoaded()
             .pipe(
                 switchMap( (loaded) => {
-                    console.log(loaded)
+                    
                     const topic = this.topic() as Topic;
 
                     newTopicReply.session_key_id = this.sessionService.sessionKeyId as string
@@ -252,7 +239,7 @@ export class ReplyWindow {
             )
             .subscribe({
                 next: (replyResp) => {
-                    console.log(replyResp) 
+                    
                     this.mrf.markAsUntouched();
                     this.mrf.setErrors(null);
                     this.mrf.reset()
