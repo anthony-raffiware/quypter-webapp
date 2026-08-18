@@ -30,9 +30,9 @@
               }
             ],
             "styles": ["src/styles.scss"],
-            "polyfills": [                    
-              "src/polyfills.js"              
-            ]                                
+            "polyfills": [
+              "src/polyfills.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -49,6 +49,27 @@
                 }
               ],
               "outputHashing": "all"
+            },
+            "production-docker": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.docker.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,

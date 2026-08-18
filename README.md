@@ -2,6 +2,14 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.8.
 
+
+docker compose -f docker/docker-compose.yml run --build --rm  angular-build
+
+
+docker compose -f docker/docker-compose.yml build --build-arg BASE_HREF=/quickcrypt/ --build-arg API_URL=http://localhost:8000  angular-build
+
+docker compose -f docker/docker-compose.yml run --rm  angular-build
+
 ## Development server
 
 To start a local development server, run:
@@ -34,9 +42,9 @@ To build the project run:
 ng build
 ```
 
-```bash                                                                  
-docker compose -f docker/docker-compose.yml run --build --rm angular-build        
-```                                                                      
+```bash
+docker compose -f docker/docker-compose.yml run --build --rm angular-build
+```
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 

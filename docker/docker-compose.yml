@@ -5,8 +5,16 @@ services:
       context: ..
       target: build
       dockerfile: docker/Dockerfile
+      args:
+        BASE_HREF: /
+        API_URL: 'http://localhost:8000/qc/api/v1'
     volumes:
       - ../dist:/app/dist
       # Don't write modules back to host
       - /app/node_modules
-    command: ["ng", "build", "--base-href=/quickcrypt/", "--configuration=production", "--output-path=/app/dist"]
+    command: [
+      '/bin/sh',
+      '-c',
+      'rm -rf /app/dist/*; mv /app/build/* /app/dist/'
+    ]
+
