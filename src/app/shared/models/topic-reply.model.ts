@@ -1,8 +1,8 @@
-import { 
-    localizeDateTime, 
-    eceDecrypt, 
+import {
+    localizeDateTime,
+    eceDecrypt,
     eceEncrypt,
-    genNonce, 
+    genNonce,
     getUtc,
     signTokens,
 } from "../utils"
@@ -12,7 +12,7 @@ import { ReplyComment } from "./reply-comment.model";
 
 export type TopicReplyData = {
     type: string,
-    data: MessageReply | ImageReply 
+    data: MessageReply | ImageReply
 }
 
 export type MessageReply = {
@@ -26,18 +26,18 @@ enum ImageFormats {
 }
 
 export type ImageReply = {
-    name:    string, 
-    type:    string, 
-    data:    string, 
+    name:    string,
+    type:    string,
+    data:    string,
     thumb:   string,
     caption: string,
-    size:    number 
+    size:    number
 }
 
-export type SigData = {                       
+export type SigData = {
   signature: string,
   date: string,
-  nonce: string 
+  nonce: string
 }
 
 export class NewTopicReply {
@@ -68,11 +68,11 @@ export class NewTopicReply {
     public async signReplyKey(sessionId: string, privKey: CryptoKey) {
 
         if ( this.topic_reply_pub_key === undefined ) {
-            return         
+            return
         }
 
         const nowUtc = getUtc()
-        const nonce  = genNonce() 
+        const nonce  = genNonce()
         const tokens = {
             sessionId: sessionId,
             pubKey: this.topic_reply_pub_key,
@@ -81,10 +81,10 @@ export class NewTopicReply {
         }
         const signature = await signTokens(tokens, privKey)
 
-        const sigData: SigData = {                       
+        const sigData: SigData = {
           signature: signature,
           date:  nowUtc,
-          nonce: nonce 
+          nonce: nonce
         }
 
         this.topic_reply_pub_key_sig = base64url.encode(JSON.stringify(sigData))
@@ -141,14 +141,14 @@ export class TopicReply {
         }
 
         const data =  await eceDecrypt(this.data, secret)
-   
+
         this.decryptedData = JSON.parse( data ) as TopicReplyData
 
         if (this.comment) {
             await this.comment.decryptData(secret)
         }
 
-        return this.decryptedData 
+        return this.decryptedData
     }
 
 }
