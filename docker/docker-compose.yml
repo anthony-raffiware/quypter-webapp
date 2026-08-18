@@ -18,7 +18,7 @@ services:
       'rm -rf /app/dist/*; mv /app/build/* /app/dist/'
     ]
 
-  web-server:
+  demo-server:
     build:
       context: ..
       dockerfile: docker/Dockerfile
