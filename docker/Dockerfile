@@ -1,7 +1,7 @@
 FROM node:24-alpine AS build
 
 ARG BASE_HREF='/'
-ARG API_URL='http://localhost:8000/qc/api/v1'
+ARG API_URL='/api'
 
 WORKDIR /app
 COPY package*.json ./
@@ -22,9 +22,13 @@ RUN ng build\
 
 FROM alpine:3.17 AS cert-builder
 
-RUN apk add --no-cache openssl
 ARG DOMAIN_NAME=localhost
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+
+RUN apk add --no-cache openssl
+
+RUN openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 \
+    -days 365 \
+    -noenc \
     -subj "/CN=${DOMAIN_NAME}" \
     -addext "subjectAltName=DNS:${DOMAIN_NAME}" \
     -keyout /tmp/server.key -out /tmp/server.crt
