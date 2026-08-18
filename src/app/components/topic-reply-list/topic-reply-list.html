@@ -1,6 +1,6 @@
 <div #scrollContainer class="qc-scrollable-box" (scroll)="onDivScroll($event)">
-@if ( decryptedReplies() === null) { 
-    Loading... 
+@if ( decryptedReplies() === null) {
+    Loading...
 }
 @else  {
 
@@ -12,9 +12,9 @@
                     <mat-card-header class="reply-card-header" >
                         @if (showIdenticon()) {
                         <div class="py-0 pe-2" title="{{reply.session_key_id}}">
-                            <svg 
-                               data-jdenticon-value="{{reply.session_key_id}}" 
-                               width="30" 
+                            <svg
+                               data-jdenticon-value="{{reply.session_key_id}}"
+                               width="30"
                                height="30"
                                role="img"
                                aria-labelledby="{{reply.session_key_id}}"
@@ -38,10 +38,10 @@
                         @else if ( reply.decryptedData?.type == 'image' ) {
                             @let imageData =reply.getImageData();
                             <div class="px-3">
-                                <img 
-                                   [src]="imageData.thumb" 
+                                <img
+                                   [src]="imageData.thumb"
                                    (click)="openViewImageDialog(imageData, $event )"
-                                   alt="Binary Image" 
+                                   alt="Binary Image"
                                 />
                                 @if (imageData.caption) {
                                   <p class="fst-italic my-0">{{ imageData.caption }}</p>
@@ -51,7 +51,9 @@
                     </mat-card-content>
 
                     <mat-card-footer class="reply-card-footer">
+                    @if ( commentAction() || reply.comment ) {
                         <hr class="mb-0"/>
+                    }
                     @if ( commentAction() ) {
                         <mat-card-actions align="end" class="py-0">
                             @if ( addingComment() != reply.id) {
@@ -73,10 +75,10 @@
                             <div class="d-flex flex-row justify-content-center flex-grow-1">
                             <mat-form-field class="reply-comment">
                                 <mat-label>Comment</mat-label>
-                                <textarea 
-                                   matInput 
+                                <textarea
+                                   matInput
                                    placeholder="Ex. wow cool!"
-                                   rows="2" 
+                                   rows="2"
                                    formControlName="comment"
                                    [errorStateMatcher]="matcher"
                                 >
@@ -86,13 +88,13 @@
                             </div>
                         </form>
                     }
-                    @if ( reply.comment && ( addingComment() != reply.id ) ) {
+                    @else if ( reply.comment && ( addingComment() != reply.id ) ) {
                         <div class="d-flex flex-row flex-grow-1 p-2 fst-italic align-items-center">
                             @if (!showIdenticon()) {
                             <div class="py-0 pe-2" title="{{reply.comment.session_key_id}}">
-                                <svg 
-                                   data-jdenticon-value="{{reply.comment.session_key_id}}" 
-                                   width="30" 
+                                <svg
+                                   data-jdenticon-value="{{reply.comment.session_key_id}}"
+                                   width="30"
                                    height="30"
                                    role="img"
                                    aria-labelledby="{{reply.comment.session_key_id}}"
@@ -114,7 +116,7 @@
         </div>
     </div>
     }
-    @if ( loadingReplies() ) { 
+    @if ( loadingReplies() ) {
     <div class="d-flex flex-row justify-content-center">
         <mat-spinner></mat-spinner>
     </div>
