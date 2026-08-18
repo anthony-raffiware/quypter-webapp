@@ -6,14 +6,14 @@ import { first, switchMap, Observable, tap, concatMap } from 'rxjs';
 
 import { ApiService, QCApiResponse, QCApiCollectionObj } from './api';
 import { LocalStorageService } from './local-storage';
-import { 
+import {
     loadPrivateKey,
     loadPublicKey,
-    createEd25519Keys, 
-    createX25519Keys, 
-    deriveSecret, 
-    exportKeyEncoded, 
-    generateAesKey 
+    createEd25519Keys,
+    createX25519Keys,
+    deriveSecret,
+    exportKeyEncoded,
+    generateAesKey
 } from '../utils';
 import { Topic, NewTopic, TopicWithReplies } from '../models/topic.model';
 import { TopicReply, NewTopicReply } from '../models/topic-reply.model';
@@ -26,7 +26,7 @@ export type TopicStorageData = {
     secretKey: string
 }
 
-export type TopicsStorageData = {                       
+export type TopicsStorageData = {
   [name: string ]: TopicStorageData
 }
 
@@ -36,7 +36,7 @@ export type TopicReplySecretData = {
     sharedSecretKey: string
 }
 
-export type TopicRepliesSecretData = {                       
+export type TopicRepliesSecretData = {
   [name: string ]: TopicReplySecretData
 }
 
@@ -56,11 +56,11 @@ export class TopicService {
             return this.sessionService.isSessionLoaded()
                 .pipe(
                     concatMap( (loaded) => {
-                       
+
                        const sessionId = this.sessionService.sessionId as string
 
                        return this.fetchTopics(sessionId)
-                   
+
                     }),
                     first()
                 )
@@ -72,11 +72,11 @@ export class TopicService {
             return this.sessionService.isSessionLoaded()
                 .pipe(
                     concatMap( (loaded) => {
-                       
+
                        const sessionId = this.sessionService.sessionId as string
 
                        return this.fetchReplies(sessionId)
-                   
+
                     }),
                     first()
                 )
@@ -84,8 +84,8 @@ export class TopicService {
     });
 
 
-    constructor() { 
- 
+    constructor() {
+
         const topicsData = this.storageService.getSerializedData('topic_data')
 
         if ( topicsData === null ) {
@@ -99,7 +99,7 @@ export class TopicService {
         }
 
         effect( () => {
-             
+
             const resp = this.topics.value()
 
             if ( resp !== undefined ) {
@@ -114,7 +114,7 @@ export class TopicService {
 
                     decrypted.map((topic) => { topicMap[topic.id] = topic } )
 
-                    this.decryptedTopics.set(decrypted); 
+                    this.decryptedTopics.set(decrypted);
                     this.topicMap.set(topicMap)
                 });
             }
@@ -136,13 +136,13 @@ export class TopicService {
         const path = sprintf('/session/%s/new_topic', newTopic.session_id )
 
         newTopic.topic_pub_key = topicPubKey
-        newTopic.topic_pub_key_sig = 'PLACEHOLDER' 
+        newTopic.topic_pub_key_sig = 'PLACEHOLDER'
 
         await newTopic.encryptData(aesSecret)
         await newTopic.signTopicKey(sessionPrivKey)
 
         return this.apiService.post<Topic>(path, newTopic )
-            .pipe( 
+            .pipe(
                 tap( (topic) => {
 
                     const topicData: TopicStorageData = {
@@ -173,18 +173,18 @@ export class TopicService {
     // }
 
     // public fetchSessionTopic(
-    //    sessionId: string, 
+    //    sessionId: string,
     //    topicId: string
     // ): Observable<QCApiResponse<Topic>> {
 
     //    const path = sprintf('/session/%s/topics/%s', sessionId, topicId )
 
     //    return this.apiService.get<Topic>(path)
-    //         //.pipe( 
+    //         //.pipe(
     //         //    tap( (topic) => {
 
     //         //        const topicData = this.getTopicData(topic.data.id)
-    //         //        const secret = topicData?.secretKey 
+    //         //        const secret = topicData?.secretKey
 
     //         //        await topic.data.decryptData(secret as string)
     //         //    })
@@ -204,12 +204,12 @@ export class TopicService {
         return resp
     }
 
-    public async decryptTopic( 
+    public async decryptTopic(
         topic: Topic,
     ): Promise<Topic> { //Promise<void> {
 
         const topicData = this.getTopicData(topic.id)
-        const secret = topicData?.secretKey 
+        const secret = topicData?.secretKey
 
         await topic.decryptData(secret as string)
 
@@ -218,7 +218,7 @@ export class TopicService {
 
 
     public fetchTopics(
-       sessionId: string 
+       sessionId: string
     ): Observable<QCApiResponse<QCApiCollectionObj<Topic>>> {
 
        const path = sprintf('/session/%s/topics', sessionId )
@@ -249,7 +249,7 @@ export class TopicService {
     }
 
     private loadTopicsData(): TopicsStorageData {
-        return this.storageService.getSerializedData('topic_data') as TopicsStorageData 
+        return this.storageService.getSerializedData('topic_data') as TopicsStorageData
     }
 
     private saveTopicsData(
@@ -259,7 +259,7 @@ export class TopicService {
     }
 
     public fetchReplies(
-       sessionId: string 
+       sessionId: string
     ): Observable<QCApiResponse<QCApiCollectionObj<Topic>>> {
 
         const path = sprintf('/session/%s/replies', sessionId )
@@ -278,12 +278,12 @@ export class TopicService {
         return this.apiService.getObject(TopicWithReplies, path, options )
     }
 
-    public async decryptRecvTopicReply( 
+    public async decryptRecvTopicReply(
         topicReply: TopicReply,
-    ): Promise<TopicReply> { 
+    ): Promise<TopicReply> {
 
         const topicData    = this.getTopicData(topicReply.topic_id)
-        const privKeyData  = topicData?.privKey as string; 
+        const privKeyData  = topicData?.privKey as string;
         const pubKeyData   = topicReply.topic_reply_pub_key;
         const topicPrivKey = await loadPrivateKey(privKeyData, "x25519");
         const topicPubKey  = await loadPublicKey(pubKeyData, "x25519");
@@ -314,12 +314,12 @@ export class TopicService {
     }
 
 
-    public async decryptSentTopicReply( 
+    public async decryptSentTopicReply(
         topicReply: TopicReply,
-    ): Promise<TopicReply> { 
+    ): Promise<TopicReply> {
 
         const topicReplyData = this.getTopicReplyData(topicReply.id)
-        const secret         = topicReplyData?.sharedSecretKey 
+        const secret         = topicReplyData?.sharedSecretKey
 
         await topicReply.decryptData(secret as string)
 
@@ -343,13 +343,13 @@ export class TopicService {
         const path = sprintf('/topic/%s/send_reply', topic.id );
 
         newTopicReply.topic_reply_pub_key = topic_reply_pub_key
-        newTopicReply.topic_reply_pub_key_sig = 'PLACEHOLDER' 
+        newTopicReply.topic_reply_pub_key_sig = 'PLACEHOLDER'
 
         await newTopicReply.encryptData(sharedSecret)
         await newTopicReply.signReplyKey(sessionId, sessionPrivKey)
 
         return this.apiService.post<TopicReply>(path, newTopicReply )
-            .pipe( 
+            .pipe(
                 tap( (topicReply) => {
 
                     const topicReplyData: TopicReplySecretData = {
@@ -389,7 +389,7 @@ export class TopicService {
 
 
     private loadTopicRepliesData(): TopicRepliesSecretData {
-        return this.storageService.getSerializedData('topic_reply_data') as TopicRepliesSecretData 
+        return this.storageService.getSerializedData('topic_reply_data') as TopicRepliesSecretData
     }
 
     private saveTopicRepliesData(
@@ -410,8 +410,8 @@ export class TopicService {
         //const topicPubKey          = await loadPublicKey(topic.topic_pub_key, "x25519");
 
         const topicReplyData = this.getTopicReplyData(newReplyComment.topic_reply_id)
-        const topicId        = topicReplyData?.topicId as string; 
-        const sharedSecret   = topicReplyData?.sharedSecretKey as string; 
+        const topicId        = topicReplyData?.topicId as string;
+        const sharedSecret   = topicReplyData?.sharedSecretKey as string;
 
         const path = sprintf('/session/%s/topics/%s/add_comment', sessionId, topicId );
 
@@ -419,7 +419,7 @@ export class TopicService {
         console.log(topicReplyData)
         try {
             await newReplyComment.encryptData(sharedSecret)
-        } 
+        }
         catch (error: unknown) {
           console.error(error);
 
@@ -432,10 +432,10 @@ export class TopicService {
         }
 
         return this.apiService.post<ReplyComment>(path, newReplyComment )
-                   //.pipe( 
+                   //.pipe(
                    //     switchMap((newCommentResp) => {
 
-                   //     }) 
+                   //     })
                    //)
     }
 

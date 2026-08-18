@@ -24,7 +24,7 @@ type QCApiResponseMeta = {
 }
 
 export type QCApiResponse<T=any> = {
-    data: T, 
+    data: T,
     meta: QCApiResponseMeta
 }
 
@@ -44,7 +44,7 @@ export class QCApiCollectionObj<T=any> {
 
     constructor(
         objectClass:  new (...args: any[]) => T,
-        data: QCApiCollection<T> 
+        data: QCApiCollection<T>
     ) {
 
         this.collection = data.collection;
@@ -64,47 +64,47 @@ export class QCApiCollectionObj<T=any> {
 export class ApiService {
 
     private apiURL = environment.apiUrl;
-    private http = inject(HttpClient); 
+    private http = inject(HttpClient);
 
 
-    public getObject<T>(                                            
+    public getObject<T>(
       type: new (...args: any[]) => T,
-      path: string, 
+      path: string,
       options?: HttpClientCommonOptions
-    ): Observable<QCApiResponse<T>>  {                                                                  
+    ): Observable<QCApiResponse<T>>  {
 
-        return this.get<T>(path, options )                                      
-            .pipe(                                                        
-                switchMap(  resp => {                                       
-               
-                   resp.data = new type(resp.data); 
+        return this.get<T>(path, options )
+            .pipe(
+                switchMap(  resp => {
+
+                   resp.data = new type(resp.data);
 
                    return of(resp)
-                }),                                                         
-                first(),                                                    
-            )                                                              
-    }                                                                    
+                }),
+                first(),
+            )
+    }
 
 
-    public getCollection<T>(                                            
+    public getCollection<T>(
       type: new (...args: any[]) => T,
-      path: string, 
+      path: string,
       options?: HttpClientCommonOptions
-    ): Observable<QCApiResponse<QCApiCollectionObj<T>>>  {                                                                  
+    ): Observable<QCApiResponse<QCApiCollectionObj<T>>>  {
 
-        return this.get<QCApiCollectionObj<T>>(path, options )                                      
-            .pipe(                                                        
-                switchMap(  resp => {                                       
+        return this.get<QCApiCollectionObj<T>>(path, options )
+            .pipe(
+                switchMap(  resp => {
                    resp.data = Object.assign(new QCApiCollectionObj<T>(type,resp.data) )
 
                    return of(resp)
-                }),                                                         
-                first(),                                                    
-            )                                                              
-    }                                                                    
+                }),
+                first(),
+            )
+    }
 
     get<T>(
-      path: string, 
+      path: string,
       options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
@@ -112,8 +112,8 @@ export class ApiService {
     }
 
     post<T>(
-      path: string, 
-      body: any, 
+      path: string,
+      body: any,
       options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
@@ -121,8 +121,8 @@ export class ApiService {
     }
 
     put<T>(
-      path: string, 
-      body: any, 
+      path: string,
+      body: any,
       options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
@@ -130,15 +130,15 @@ export class ApiService {
     }
 
     delete<T>(
-      path: string, 
-      options?: HttpClientCommonOptions 
+      path: string,
+      options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.delete<QCApiResponse<T>>, path, options )
     }
 
-    request<T>( 
-      requestFunc: QCRequestFunc<T>,  
+    request<T>(
+      requestFunc: QCRequestFunc<T>,
       path: string,
       ...args: any[]
     ): Observable<T> {
@@ -147,7 +147,7 @@ export class ApiService {
 
         return requestFunc.bind(this.http)(url, args[0], ...args.slice(1, args.length ) )
             .pipe(
-                catchError( (error: HttpErrorResponse): Observable<T> => {                
+                catchError( (error: HttpErrorResponse): Observable<T> => {
 
                     console.error('request url', url)
                     console.error('request args', args)
@@ -157,20 +157,20 @@ export class ApiService {
                     } else {
                       console.error(`Backend returned code ${error.status}, body was: ${error.error}`);
                     }
-                                             
-                    return throwError( () => error )                                  
-                }),                                                                 
+
+                    return throwError( () => error )
+                }),
                 first(),
                 tap( (response) => {
 
                     if (!environment.production)  {
                         console.log('request url', url)
                         console.log('request args', args)
-                        console.log('response data', response) 
+                        console.log('response data', response)
                     }
                 })
             )
-     
+
     }
 }
 
