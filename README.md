@@ -28,4 +28,6 @@ cd quick-crypt-webapp
 docker compose -f docker/docker-compose.yml up -d demo-server
 ```
 
+Your instance should be accessible at https://YOUR-HOST:8443/. Note that the demo server uses an automatically created self-signed TLS certificate so an initial 'net::ERR_CERT_AUTHORITY_INVALID' error is expected.
+
 
