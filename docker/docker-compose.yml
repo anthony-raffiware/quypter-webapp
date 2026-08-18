@@ -15,7 +15,8 @@ services:
     command: [
       '/bin/sh',
       '-c',
-      'rm -rf /app/dist/*; mv /app/build/* /app/dist/'
+      # Preserve directories so nginx root doesn't break
+      'find /app/dist/ -type f -delete; cp -R /app/build/* /app/dist/'
     ]
 
   demo-server:
