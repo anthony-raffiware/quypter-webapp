@@ -18,7 +18,7 @@ docker compose -f docker/docker-compose.yml up -d
 cd ..
 ```
 
-Run web server to server web app
+Run web app server
 
 ```bash
 git clone https://github.com/anthony-raffiware/quick-crypt-webapp.git
