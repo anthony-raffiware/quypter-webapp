@@ -8,9 +8,11 @@ git clone https://github.com/anthony-raffiware/quick-crypt-backend.git
 
 cd quick-crypt-backend
 ```
-Copy  [Link](docker/override.env.example) to ./override.env and edit PROD_PASS
 
+Copy override.env.example to override.env and edit PROD_PASS
 ```bash
+cp docker/override.env.example override.env
+
 docker compose -f docker/docker-compose.yml up -d
 
 cd ..
