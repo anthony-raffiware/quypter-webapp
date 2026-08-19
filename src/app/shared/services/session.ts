@@ -17,6 +17,7 @@ import {
 
 import { NewSession, Session } from '../models/session.model';
 import { createEd25519Keys, exportKeyEncoded } from '../utils';
+import { AppErrorService } from './app-error/app-error.service';
 
 
 export type SessionData = {
@@ -31,8 +32,10 @@ export type SessionData = {
 @Service()
 export class SessionService {
 
-    private apiService = inject(ApiService);
+    private apiService     = inject(ApiService);
     private storageService = inject(LocalStorageService);
+    private appErrorService = inject(AppErrorService);
+
     private sessionData:  SessionData = {};
 
     sessionLoaded$: BehaviorSubject<boolean> ;
@@ -68,7 +71,7 @@ export class SessionService {
                         console.log('found session')
                     },
                     error: (error: HttpErrorResponse) => {
-                        console.log('session error');
+                        this.appErrorService.setApiError(error)
                     }
                 })
 
@@ -98,6 +101,7 @@ export class SessionService {
     get sessionPrivKey(): string {
          return this.sessionData.session_priv_key as string
     }
+
     private createAndSetSession(): void {
 
         from( this.createSession() )
@@ -106,15 +110,20 @@ export class SessionService {
                    return responseOb
                 })
             )
-            .subscribe( (response) => {
-                this.sessionData.id = response.data.id
-                this.sessionData.key_id = response.data.key_id
-                this.sessionData.created_ts = response.data.key_id
+            .subscribe({
+                next:  (response) => {
+                    this.sessionData.id = response.data.id
+                    this.sessionData.key_id = response.data.key_id
+                    this.sessionData.created_ts = response.data.key_id
 
-                this.sessionLoaded$.next(true);
-                this.session$.next(this.sessionData)
+                    this.sessionLoaded$.next(true);
+                    this.session$.next(this.sessionData)
 
-                this.saveLocalSessionData()
+                    this.saveLocalSessionData()
+                },
+                error: (error) => {
+                    this.appErrorService.setApiError(error)
+                }
             });
 
     }

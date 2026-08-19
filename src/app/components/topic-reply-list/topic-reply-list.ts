@@ -1,23 +1,20 @@
-import { 
-    Component, 
-    input, 
-    output, 
-    inject, 
-    signal, 
+import {
+    Component,
+    input,
+    output,
+    inject,
+    signal,
     effect,
     computed,
     debounced,
-    ViewChild, 
+    ViewChild,
     ElementRef,
     ChangeDetectorRef,
-    model, 
+    model,
 } from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
-  FormControl,
-  FormGroupDirective,
-  NgForm,
   Validators,
   FormsModule,
   ReactiveFormsModule,
@@ -39,18 +36,19 @@ import { getUtc } from '../../shared/utils';
 import { SessionService } from '../../shared/services/session';
 import { TopicService } from '../../shared/services/topic';
 import { QCErrorStateMatcher } from '../../shared/utils';
+import { AppErrorService } from '../../shared/services/app-error/app-error.service';
 
 
 @Component({
   selector: 'app-topic-reply-list',
   imports: [
-    FormsModule, 
+    FormsModule,
     ReactiveFormsModule,
-    MatButtonModule, 
+    MatButtonModule,
     MatCardModule,
-    MatFormFieldModule, 
+    MatFormFieldModule,
     MatProgressSpinnerModule,
-    MatInputModule, 
+    MatInputModule,
     NgxJdenticonModule
   ],
   templateUrl: './topic-reply-list.html',
@@ -58,9 +56,10 @@ import { QCErrorStateMatcher } from '../../shared/utils';
 })
 export class TopicReplyList {
 
-    public  dialog         = inject(MatDialog);
-    private sessionService = inject(SessionService);
-    private topicService = inject(TopicService);
+    public  dialog          = inject(MatDialog);
+    private sessionService  = inject(SessionService);
+    private topicService    = inject(TopicService);
+    private appErrorService = inject(AppErrorService);
 
 
     @ViewChild('scrollContainer') scrollContainer!: ElementRef;
@@ -95,7 +94,7 @@ export class TopicReplyList {
                 this.endOfScrollOut.emit(scrollEvent)
             }
         })
-            
+
     }
 
     get cf(): FormGroup { return this.commentForm; }
@@ -111,11 +110,11 @@ export class TopicReplyList {
         });
 
     }
-    
+
     onDivScroll(event: any) {
 
         const element = event.target;
-      
+
         if ( (element.scrollTop > 0 )
           && (element.offsetHeight + element.scrollTop >= element.scrollHeight)
         ) {
@@ -143,13 +142,13 @@ export class TopicReplyList {
         }
 
         const formVals = this.cf.value;
-        const newComment = new NewReplyComment({ 
+        const newComment = new NewReplyComment({
                               topic_reply_id: this.addingComment() as string
                            });
 
         newComment.decryptedData = {
             comment: formVals.comment,
-            updated: getUtc() 
+            updated: getUtc()
         }
 
         this.sessionService.isSessionLoaded()
@@ -157,13 +156,13 @@ export class TopicReplyList {
                 switchMap( (loaded) => {
                     console.log(loaded)
 
-                    return from(this.topicService.createReplyComment(newComment))  
+                    return from(this.topicService.createReplyComment(newComment))
                         .pipe( switchMap( (s) => { return s }))
                 })
             )
             .subscribe({
                 next: (commentResp) => {
-                    console.log(commentResp) 
+                    console.log(commentResp)
                     this.cf.markAsUntouched();
                     this.cf.setErrors(null);
                     this.cf.reset();
@@ -172,19 +171,19 @@ export class TopicReplyList {
                     reply.comment = new ReplyComment(commentResp.data);
                     reply.comment.decryptedData = {
                         comment: formVals.comment,
-                        updated: getUtc() 
+                        updated: getUtc()
                     }
 
-                    this.decryptedReplies.update(replies => 
-                        replies.map(curReply => 
-                          curReply.id === reply.id ? reply : curReply 
+                    this.decryptedReplies.update(replies =>
+                        replies.map(curReply =>
+                          curReply.id === reply.id ? reply : curReply
                         )
                     );
 
                     //this.cdr.detectChanges();
                 },
                 error: (error) => {
-                    console.error('Topics Request failed', error.error);
+                    this.appErrorService.setApiError(error)
                 }
             })
 

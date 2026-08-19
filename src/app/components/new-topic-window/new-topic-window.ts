@@ -19,6 +19,7 @@ import { from, switchMap } from 'rxjs';
 import { NewTopic } from '../../shared/models/topic.model';
 import { SessionService } from '../../shared/services/session';
 import { TopicService } from '../../shared/services/topic';
+import { AppErrorService } from '../../shared/services/app-error/app-error.service';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -32,10 +33,10 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'app-new-topic-window',
   imports: [
-    FormsModule, 
-    MatButtonModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
+    FormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
     ReactiveFormsModule
   ],
   templateUrl: './new-topic-window.html',
@@ -49,6 +50,7 @@ export class NewTopicWindow {
 
     private sessionService = inject(SessionService);
     private topicService = inject(TopicService);
+    private appErrorService = inject(AppErrorService);
 
 
     constructor(
@@ -85,17 +87,16 @@ export class NewTopicWindow {
                     console.log(loaded)
                     newTopic.session_id = this.sessionService.sessionId as string
 
-                    return from(this.topicService.createTopic(newTopic))  
+                    return from(this.topicService.createTopic(newTopic))
                         .pipe( switchMap( (s) => { return s }))
                 })
             )
             .subscribe({
                 next: (topic_resp) => {
-                    console.log(topic_resp) 
                     this.router.navigate([ '..', topic_resp.data.id  ], { relativeTo: this.route })
                 },
                 error: (error) => {
-                    console.error('Topics Request failed', error.error);
+                    this.appErrorService.setApiError(error)
                 }
             })
 

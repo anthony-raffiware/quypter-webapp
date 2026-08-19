@@ -254,7 +254,6 @@ export class ReplyWindow {
                     this.topicResource.reload()
                 },
                 error: (error) => {
-                    //console.error('Topics Request failed', error);
                     this.appErrorService.setApiError(error)
                 }
             })

@@ -35,9 +35,13 @@ export class AppError {
             const error = this.appError();
 
             if ( error ) {
-                console.log('Got Error', error)
-                this.dialog.open(AppErrorDialog, {
+
+                const dialogRef = this.dialog.open(AppErrorDialog, {
                     data: {error: error},
+                });
+
+                dialogRef.afterClosed().subscribe(result => {
+                    this.appErrorService.clearError()
                 });
             }
         })
