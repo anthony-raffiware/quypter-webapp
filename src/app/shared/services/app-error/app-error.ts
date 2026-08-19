@@ -23,10 +23,10 @@ export interface DialogData {
 })
 export class AppError {
 
-    public appErrorService = inject(AppErrorService);
-    public dialog          = inject(MatDialog);
+    private readonly appErrorService = inject(AppErrorService);
+    private readonly dialog          = inject(MatDialog);
 
-    public appError = computed(() => this.appErrorService.appError() );
+    readonly appError = computed(() => this.appErrorService.appError() );
 
     constructor() {
 

@@ -14,7 +14,7 @@ export type QCAppError = {
 @Service()
 export class AppErrorService {
 
-    public appError = signal<QCAppError | null>(null);
+    readonly appError = signal<QCAppError | null>(null);
 
     public setApiError(
         error: HttpErrorResponse
