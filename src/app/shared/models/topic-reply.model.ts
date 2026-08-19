@@ -30,7 +30,7 @@ export type ImageReply = {
     type:    string,
     data:    string,
     thumb:   string,
-    caption: string,
+    caption?: string,
     size:    number
 }
 

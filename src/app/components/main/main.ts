@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SideNav } from '../side-nav/side-nav';
+
 import {MatTabsModule} from '@angular/material/tabs';
-import { ApiService } from '../../shared/services/api';
-import { SessionService } from '../../shared/services/session';
+
+import { SideNav } from '../side-nav/side-nav';
 import { AppError } from '../../shared/services/app-error/app-error';
 
 @Component({
@@ -12,9 +12,4 @@ import { AppError } from '../../shared/services/app-error/app-error';
   templateUrl: './main.html',
   styleUrl: './main.scss',
 })
-export class Main {
-
-    private apiService = inject(ApiService);
-    private sessionService = inject(SessionService);
-
-}
+export class Main {}

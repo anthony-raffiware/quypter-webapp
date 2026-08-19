@@ -3,24 +3,18 @@
      [routerLink]="[{outlets:{'select-list':'topic-list' }} ]"
      routerLinkActive
      #rla2="routerLinkActive"
-     [active]="rla2.isActive" 
-   > 
-      Topics 
+     [active]="rla2.isActive"
+   >
+      Topics
    </a>
    <a mat-tab-link
      [routerLink]="[{outlets:{'select-list':'reply-list' }} ]"
      routerLinkActive
      #rla="routerLinkActive"
-     [active]="rla.isActive" 
-   > 
-      Replies 
+     [active]="rla.isActive"
+   >
+      Replies
    </a>
 
 
 </nav>
-<!--
-     [routerLink]="['/topic', testPath, {outlets:{'select-list':'topic-list'}} ]"
-     [routerLink]="['/reply', testPath, {outlets:{'select-list':'reply-list'}}]"
-
-
--->

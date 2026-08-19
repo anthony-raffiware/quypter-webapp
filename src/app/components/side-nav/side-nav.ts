@@ -1,4 +1,4 @@
-import { Component, Input, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import {MatTabsModule, MatTabNavPanel} from '@angular/material/tabs';
 
@@ -9,7 +9,5 @@ import {MatTabsModule, MatTabNavPanel} from '@angular/material/tabs';
   styleUrl: './side-nav.scss',
 })
 export class SideNav {
-   tabPanel = input.required<MatTabNavPanel>();
-   testPath = 'new'
-   //@Input() tabPanel!: MatTabNavPanel;
+    tabPanel = input.required<MatTabNavPanel>();
 }

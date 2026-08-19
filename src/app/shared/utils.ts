@@ -1,3 +1,8 @@
+import {
+    Pipe,
+    PipeTransform
+} from '@angular/core';
+
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone.js';
 import utc from 'dayjs/plugin/utc.js';
@@ -547,3 +552,19 @@ export class QCErrorStateMatcher implements ErrorStateMatcher {
   }
 }
 
+
+@Pipe({ name: 'bytesDisplay' })
+export class byteDisplayPipe implements PipeTransform {
+
+    transform(bytes: number): string {
+
+        if (isNaN(bytes) || bytes === 0) {
+            return '0 Bytes';
+        }
+
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+
+        return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
+    }
+}

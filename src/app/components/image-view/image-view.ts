@@ -1,22 +1,22 @@
-import { 
-    Component, 
-    inject, 
-    signal, 
+import {
+    Component,
+    inject,
+    signal,
     computed ,
 } from '@angular/core';
-
 import {FormsModule} from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
+
 import {MatButtonModule} from '@angular/material/button';
 import {
-  MAT_DIALOG_DATA,
-  MatDialogContent,
-  MatDialogRef,
+    MAT_DIALOG_DATA,
+    MatDialogContent,
+    MatDialogRef,
 } from '@angular/material/dialog';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { DomSanitizer } from '@angular/platform-browser';
 
 export interface ImageDialogData {
   imageData: string;
@@ -44,7 +44,7 @@ export class ImageView {
 
     readonly imageData    = signal<string>(this.data.imageData);
 
-    public safeImageData = computed(() => 
+    public safeImageData = computed(() =>
         this.domSanitizer.bypassSecurityTrustResourceUrl(this.imageData())
     );
 

@@ -1,4 +1,12 @@
-import { Component, input, effect, signal, inject, computed, model } from '@angular/core';
+import {
+    Component,
+    input,
+    effect,
+    signal,
+    inject,
+    computed,
+    model
+} from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
@@ -6,15 +14,17 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
+
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatDialog } from '@angular/material/dialog';
 
-import { toSignal, toObservable, rxResource } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { filter, first, switchMap, forkJoin, of, from } from 'rxjs';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { switchMap, of, from } from 'rxjs';
+
 import { TopicService } from '../../shared/services/topic';
 import { SessionService } from '../../shared/services/session';
 import { Topic, TopicWithReplies } from '../../shared/models/topic.model';
@@ -32,13 +42,13 @@ export type TopicReplies = Array<TopicReplyData>
 @Component({
   selector: 'app-reply-window',
   imports: [
-    FormsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    TopicReplyList
+      FormsModule,
+      MatButtonModule,
+      MatFormFieldModule,
+      MatInputModule,
+      ReactiveFormsModule,
+      MatCardModule,
+      TopicReplyList
   ],
   templateUrl: './reply-window.html',
   styleUrl: './reply-window.scss',
@@ -67,7 +77,7 @@ export class ReplyWindow {
     private replyLastId = signal<string|null>(null);
     private replyLastTs = signal<string|null>(null);
 
-    topicResource = rxResource({
+    private topicResource = rxResource({
         params: () => ({
             sessionId: this.sessionId(),
             topicId: this.topicUuid(),
@@ -106,10 +116,7 @@ export class ReplyWindow {
     get mrf(): FormGroup { return this.messageReplyForm; }
 
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router
-    ) {
+    constructor() {
 
         this.messageReplyForm = new FormBuilder().group({
             messageData: ['', [Validators.required]],
@@ -156,7 +163,9 @@ export class ReplyWindow {
 
     }
 
-    handleEndOfScroll(event: Event ): void {
+    handleEndOfScroll(
+        event: Event
+    ): void {
 
         const last = this.decryptedReplies().at(-1);
 
@@ -168,7 +177,9 @@ export class ReplyWindow {
 
     }
 
-    openAddImageDialog(event: Event ): void {
+    openAddImageDialog(
+        event: Event
+    ): void {
 
         event.preventDefault();
 
@@ -184,7 +195,10 @@ export class ReplyWindow {
         });
     }
 
-    openViewImageDialog( imageReply: ImageReply, event: Event): void {
+    openViewImageDialog(
+        imageReply: ImageReply,
+        event: Event
+    ): void {
 
         const imageDialogRef = this.dialog.open(ImageView, {
             data: { imageData: imageReply.data },
@@ -212,7 +226,9 @@ export class ReplyWindow {
         this.addTopicReply(replyData);
     }
 
-    addReplyImage( replyImage: ImageReply ) {
+    addReplyImage(
+        replyImage: ImageReply
+    ) {
 
         const replyData: TopicReplyData = {
             type: 'image',
@@ -222,7 +238,9 @@ export class ReplyWindow {
         this.addTopicReply(replyData);
     }
 
-    addTopicReply(replyData: TopicReplyData) {
+    addTopicReply(
+        replyData: TopicReplyData
+    ) {
 
         const newTopicReply = new NewTopicReply();
         newTopicReply.data = replyData;

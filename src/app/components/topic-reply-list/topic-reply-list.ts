@@ -9,7 +9,6 @@ import {
     debounced,
     ViewChild,
     ElementRef,
-    ChangeDetectorRef,
     model,
 } from '@angular/core';
 import {
@@ -21,17 +20,19 @@ import {
 } from '@angular/forms';
 import { switchMap, from } from 'rxjs';
 
+import { MatCardModule } from '@angular/material/card';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
+
+import { NgxJdenticonModule } from 'ngx-jdenticon';
+
 import { ImageReply } from '../../shared/models/topic-reply.model';
 import { ImageView } from '../image-view/image-view';
-import {MatCardModule} from '@angular/material/card';
-import {MatInputModule} from '@angular/material/input';
-import {MatButtonModule} from '@angular/material/button';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import { MatDialog } from '@angular/material/dialog';
 import { TopicReply } from '../../shared/models/topic-reply.model';
-import { NgxJdenticonModule } from 'ngx-jdenticon';
-import { ReplyComment, NewReplyComment, ReplyCommentData } from '../../shared/models/reply-comment.model';
+import { ReplyComment, NewReplyComment } from '../../shared/models/reply-comment.model';
 import { getUtc } from '../../shared/utils';
 import { SessionService } from '../../shared/services/session';
 import { TopicService } from '../../shared/services/topic';
@@ -79,9 +80,7 @@ export class TopicReplyList {
     public matcher = new QCErrorStateMatcher();
     public commentForm!: FormGroup;
 
-    constructor(
-        private cdr: ChangeDetectorRef
-    ) {
+    constructor() {
 
         this.commentForm = new FormBuilder().group({
             comment: ['', [Validators.required ] ],
@@ -99,7 +98,10 @@ export class TopicReplyList {
 
     get cf(): FormGroup { return this.commentForm; }
 
-    openViewImageDialog( imageReply: ImageReply, event: Event): void {
+    openViewImageDialog(
+        imageReply: ImageReply,
+        event: Event
+    ): void {
 
         const imageDialogRef = this.dialog.open(ImageView, {
           data: { imageData: imageReply.data },
@@ -111,7 +113,9 @@ export class TopicReplyList {
 
     }
 
-    onDivScroll(event: any) {
+    onDivScroll(
+        event: any
+    ) {
 
         const element = event.target;
 
@@ -122,11 +126,15 @@ export class TopicReplyList {
       }
     }
 
-    addComment(replyId: string) {
+    addComment(
+        replyId: string
+    ) {
         this.addingComment.set(replyId)
     }
 
-    editComment(reply: TopicReply) {
+    editComment(
+        reply: TopicReply
+    ) {
         this.cf.get('comment')?.setValue(reply.comment?.decryptedData?.comment);
         this.addingComment.set(reply.id)
     }
@@ -135,7 +143,9 @@ export class TopicReplyList {
         this.addingComment.set(null)
     }
 
-    submitComment(reply: TopicReply ) {
+    submitComment(
+        reply: TopicReply
+    ) {
 
         if (this.cf.invalid) {
            return;
@@ -180,7 +190,6 @@ export class TopicReplyList {
                         )
                     );
 
-                    //this.cdr.detectChanges();
                 },
                 error: (error) => {
                     this.appErrorService.setApiError(error)
