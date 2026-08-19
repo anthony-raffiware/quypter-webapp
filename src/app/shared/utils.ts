@@ -22,11 +22,11 @@ const SUBTLE = crypto.subtle;
 export async function createEd25519Keys() {
 
     return SUBTLE.generateKey(
-      {
-        name: "Ed25519",
-      },
-      true,
-      ["sign", "verify"],
+        {
+          name: "Ed25519",
+        },
+        true,
+        ["sign", "verify"],
     );
 }
 
@@ -38,11 +38,11 @@ export async function createEd25519Keys() {
 export async function createX25519Keys() {
 
     return SUBTLE.generateKey(
-      {
-        name: "X25519",
-      },
-      true,
-      ["deriveKey", "deriveBits"],
+        {
+          name: "X25519",
+        },
+        true,
+        ["deriveKey", "deriveBits"],
     );
 }
 
@@ -59,12 +59,12 @@ export async function deriveSecret(
 ) {
 
     const secret = await SUBTLE.deriveBits(
-      {
-        name: "X25519",
-        public: pubPk,
-      },
-      pk,
-      SECRET_KEY_BIT_LENGTH
+        {
+          name: "X25519",
+          public: pubPk,
+        },
+        pk,
+        SECRET_KEY_BIT_LENGTH
     );
 
     return bufToBase64Url(Buffer.from(secret));
@@ -87,13 +87,13 @@ export async function loadPrivateKey(
     const keyBuf = base64UrlToBuf(privKey)
 
     const pk = await SUBTLE.importKey(
-      format,
-      keyBuf,
-      algorithm,
-      true,
-      ( algorithm.toLowerCase() === "ed25519" ) ? ['sign'] :
-      ( algorithm.toLowerCase() === "x25519" )  ? ["deriveKey", "deriveBits"] :
-      []
+        format,
+        keyBuf,
+        algorithm,
+        true,
+        ( algorithm.toLowerCase() === "ed25519" ) ? ['sign'] :
+        ( algorithm.toLowerCase() === "x25519" )  ? ["deriveKey", "deriveBits"] :
+        []
     );
 
     return pk;
@@ -113,13 +113,13 @@ export async function loadPublicKey(
 
     const keyBuf = base64UrlToBuf(pubKey)
     const pk = await SUBTLE.importKey(
-      "spki",
-      keyBuf,
-      algorithm,
-      true,
-      ( algorithm.toLowerCase() === "ed25519" ) ? ['verify'] :
-      ( algorithm.toLowerCase() === "x25519" )  ? [] :
-      [],
+        "spki",
+        keyBuf,
+        algorithm,
+        true,
+        ( algorithm.toLowerCase() === "ed25519" ) ? ['verify'] :
+        ( algorithm.toLowerCase() === "x25519" )  ? [] :
+        [],
     );
 
     return pk;
@@ -144,21 +144,21 @@ export async function eceEncrypt(
     const salt      = crypto.getRandomValues(new Uint8Array(16));
 
     const secretKey = await SUBTLE.importKey(
-      "raw",
-      secretBuf,
-      { name: "HKDF" },
-      false,
-      ["deriveBits"]
+        "raw",
+        secretBuf,
+        { name: "HKDF" },
+        false,
+        ["deriveBits"]
     );
 
     const derivedSecret = await SUBTLE.deriveBits(
-      { name: "HKDF",
-        hash: "SHA-256",
-        salt: Buffer.from(''),
-        info: buildInfoBuf("Content-Encoding: aes128gcm")
-      },
-      secretKey,
-      AES_GCM_KEY_LENGTH
+        { name: "HKDF",
+          hash: "SHA-256",
+          salt: Buffer.from(''),
+          info: buildInfoBuf("Content-Encoding: aes128gcm")
+        },
+        secretKey,
+        AES_GCM_KEY_LENGTH
     );
 
     const dataStreamToEncrypt = bufferToStream(dataBuf);
@@ -196,21 +196,21 @@ export async function eceDecrypt(
     const secretBuf = Buffer.from(base64UrlToBuf(secret));
 
     const secretKey = await SUBTLE.importKey(
-      "raw",
-      secretBuf,
-      { name: "HKDF" },
-      false,
-      ["deriveBits"]
+        "raw",
+        secretBuf,
+        { name: "HKDF" },
+        false,
+        ["deriveBits"]
     );
 
     const derivedSecret = await SUBTLE.deriveBits(
-      { name: "HKDF",
-        hash: "SHA-256",
-        salt: Buffer.from(''),
-        info: buildInfoBuf("Content-Encoding: aes128gcm")
-      },
-      secretKey,
-      AES_GCM_KEY_LENGTH
+        { name: "HKDF",
+          hash: "SHA-256",
+          salt: Buffer.from(''),
+          info: buildInfoBuf("Content-Encoding: aes128gcm")
+        },
+        secretKey,
+        AES_GCM_KEY_LENGTH
     );
 
     const cipherBuf           = Buffer.from(base64UrlToBuf(cipher));
@@ -233,7 +233,7 @@ async function streamToBuf(
 ) {
 
     const result = await new Response( ArrayBufferToUint8ArrayStream(s) )
-                      .arrayBuffer();
+                             .arrayBuffer();
 
     return Buffer.from(result)
 }
@@ -323,7 +323,7 @@ function str2ab(
     const bufView = new Uint8Array(buf);
 
     for (let i = 0, strLen = str.length; i < strLen; i++) {
-      bufView[i] = str.charCodeAt(i);
+        bufView[i] = str.charCodeAt(i);
     }
 
     return buf;
@@ -336,12 +336,12 @@ function str2ab(
 export async function generateAesKey() {
 
     const key = await crypto.subtle.generateKey(
-      {
-        name: "AES-GCM",
-        length: 256, // Can be 128, 192, or 256
-      },
-      true,
-      ["encrypt", "decrypt"]
+        {
+          name: "AES-GCM",
+          length: 256, // Can be 128, 192, or 256
+        },
+        true,
+        ["encrypt", "decrypt"]
     );
 
     const rawKey: ArrayBuffer = await crypto.subtle.exportKey("raw", key);
@@ -369,9 +369,9 @@ export async function signTokens(
     const msg = generateMsgFromTokens(tokens);
 
     const signature = await SUBTLE.sign(
-      "Ed25519",
-      pk,
-      msg
+        "Ed25519",
+        pk,
+        msg
     );
 
     return bufToBase64Url( Buffer.from(signature) );
@@ -394,38 +394,38 @@ export function generateMsgFromTokens(
     const allValues: Array<Uint8Array> = [];
 
     tokenKeys.sort().map( (t,i) => {
-       const tVal = tokens[t];
+        const tVal = tokens[t];
 
-       /* Don't put already encoded binary data through·
-        * a utf-8 text encoder */
-       if ( tVal instanceof Uint8Array && tVal.length > 0 )  {
-         allValues.push( tVal as Uint8Array )
-       }
-       else if ( tVal !== undefined || tVal !== '' ) {
-         allValues.push( enc.encode( tVal as string ) )
-       }
-       else {
-         return
-       }
+        /* Don't put already encoded binary data through·
+         * a utf-8 text encoder */
+        if ( tVal instanceof Uint8Array && tVal.length > 0 )  {
+          allValues.push( tVal as Uint8Array )
+        }
+        else if ( tVal !== undefined || tVal !== '' ) {
+          allValues.push( enc.encode( tVal as string ) )
+        }
+        else {
+          return
+        }
 
-       /* Sorted values are joined on commas */
-       if ( i < tokenKeys.length - 1 ) {
-         allValues.push( comma_enc )
-       }
+        /* Sorted values are joined on commas */
+        if ( i < tokenKeys.length - 1 ) {
+          allValues.push( comma_enc )
+        }
     });
 
     /* Flatten all our Uint8Array's into one */
     let length = 0;
     allValues.forEach(item => {
-      length += item.length;
+        length += item.length;
     });
 
     const mergedArray = new Uint8Array(length);
     let offset      = 0;
 
     allValues.forEach(item => {
-      mergedArray.set(item, offset);
-      offset += item.length;
+        mergedArray.set(item, offset);
+        offset += item.length;
     });
 
     return mergedArray;
@@ -478,10 +478,10 @@ export async function exportKey(
     const type = key.type;
 
     if ( type === 'private' ) {
-       return SUBTLE.exportKey("pkcs8", key);
+        return SUBTLE.exportKey("pkcs8", key);
     }
     else if ( type === 'public' ) {
-       return SUBTLE.exportKey("spki", key);
+        return SUBTLE.exportKey("spki", key);
     }
 
     return undefined
@@ -499,12 +499,12 @@ export function localizeDateTime(
 ) {
 
     if ( iso_8601_dt ) {
-       const day = dayjs(iso_8601_dt);
+        const day = dayjs(iso_8601_dt);
 
-       return day.format('YYYY-MM-DD HH:mm:ss');
+        return day.format('YYYY-MM-DD HH:mm:ss');
     }
     else {
-       return 'Not Set'
+        return 'Not Set'
     }
 }
 

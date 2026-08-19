@@ -48,12 +48,16 @@ export class NewTopicReply {
     public data!: TopicReplyData | string;
 
 
-    constructor(params: Partial<TopicReply> = {}) {
+    constructor(
+        params: Partial<TopicReply> = {}
+    ) {
         Object.assign(this, params);
     }
 
 
-    public async encryptData(secret: string): Promise<void> {
+    public async encryptData(
+        secret: string
+    ): Promise<void> {
 
         if ( typeof this.data !== 'object' ) {
            return
@@ -65,7 +69,10 @@ export class NewTopicReply {
     }
 
 
-    public async signReplyKey(sessionId: string, privKey: CryptoKey) {
+    public async signReplyKey(
+        sessionId: string,
+        privKey: CryptoKey
+    ) {
 
         if ( this.topic_reply_pub_key === undefined ) {
             return
@@ -82,9 +89,9 @@ export class NewTopicReply {
         const signature = await signTokens(tokens, privKey)
 
         const sigData: SigData = {
-          signature: signature,
-          date:  nowUtc,
-          nonce: nonce
+            signature: signature,
+            date:  nowUtc,
+            nonce: nonce
         }
 
         this.topic_reply_pub_key_sig = base64url.encode(JSON.stringify(sigData))
@@ -105,7 +112,10 @@ export class TopicReply {
     public expires_ts?: string;
     public comment: ReplyComment | undefined;
 
-    constructor(params: Partial<TopicReply> = {}) {
+    constructor(
+        params: Partial<TopicReply> = {}
+    ) {
+
         Object.assign(this, params);
 
         if (this.comment) {
@@ -133,7 +143,9 @@ export class TopicReply {
         return this.decryptedData?.data as ImageReply
     }
 
-    public async decryptData(secret: string): Promise<TopicReplyData> {
+    public async decryptData(
+        secret: string
+    ): Promise<TopicReplyData> {
 
         if ( typeof this.data === 'object' ) {
            console.log('already decrypted')

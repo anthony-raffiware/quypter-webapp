@@ -87,9 +87,9 @@ export class ApiService {
 
 
     public getCollection<T>(
-      type: new (...args: any[]) => T,
-      path: string,
-      options?: HttpClientCommonOptions
+        type: new (...args: any[]) => T,
+        path: string,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<QCApiCollectionObj<T>>>  {
 
         return this.get<QCApiCollectionObj<T>>(path, options )
@@ -103,44 +103,49 @@ export class ApiService {
             )
     }
 
+
     get<T>(
-      path: string,
-      options?: HttpClientCommonOptions
+        path: string,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.get<QCApiResponse<T>>, path, options )
     }
 
+
     post<T>(
-      path: string,
-      body: any,
-      options?: HttpClientCommonOptions
+        path: string,
+        body: any,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.post<QCApiResponse<T>>, path, body, options )
     }
 
+
     put<T>(
-      path: string,
-      body: any,
-      options?: HttpClientCommonOptions
+        path: string,
+        body: any,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.put<QCApiResponse<T>>, path, body, options )
     }
 
+
     delete<T>(
-      path: string,
-      options?: HttpClientCommonOptions
+        path: string,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.delete<QCApiResponse<T>>, path, options )
     }
 
+
     request<T>(
-      requestFunc: QCRequestFunc<T>,
-      path: string,
-      ...args: any[]
+        requestFunc: QCRequestFunc<T>,
+        path: string,
+        ...args: any[]
     ): Observable<T> {
 
         const url = sprintf('%s%s', this.apiURL, path )

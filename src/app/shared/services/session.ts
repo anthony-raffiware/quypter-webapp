@@ -32,8 +32,8 @@ export type SessionData = {
 @Service()
 export class SessionService {
 
-    private apiService     = inject(ApiService);
-    private storageService = inject(LocalStorageService);
+    private apiService      = inject(ApiService);
+    private storageService  = inject(LocalStorageService);
     private appErrorService = inject(AppErrorService);
 
     private sessionData:  SessionData = {};
@@ -43,7 +43,7 @@ export class SessionService {
     session: Signal<SessionData>;
 
     constructor() {
-        console.log('session init')
+
         this.sessionLoaded$ = new BehaviorSubject<boolean>(false);
         this.session$ = new BehaviorSubject<SessionData>({});
 
@@ -87,11 +87,11 @@ export class SessionService {
     }
 
     get sessionId() {
-         return  this.sessionData.id as string
+         return this.sessionData.id as string
     }
 
     get sessionKeyId() {
-         return  this.sessionData.key_id as string
+         return this.sessionData.key_id as string
     }
 
     get sessionPubKey(): string {
