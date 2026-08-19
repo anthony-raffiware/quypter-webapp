@@ -4,10 +4,11 @@ import { SideNav } from '../side-nav/side-nav';
 import {MatTabsModule} from '@angular/material/tabs';
 import { ApiService } from '../../shared/services/api';
 import { SessionService } from '../../shared/services/session';
+import { AppError } from '../../shared/services/app-error/app-error';
 
 @Component({
   selector: 'app-main',
-  imports: [RouterOutlet, SideNav, MatTabsModule],
+  imports: [RouterOutlet, SideNav, MatTabsModule, AppError],
   templateUrl: './main.html',
   styleUrl: './main.scss',
 })

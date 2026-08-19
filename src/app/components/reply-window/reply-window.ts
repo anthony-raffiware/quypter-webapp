@@ -24,6 +24,7 @@ import { TopicReplyData, ImageReply } from '../../shared/models/topic-reply.mode
 import { AddReplyImage } from '../add-reply-image/add-reply-image';
 import { ImageView } from '../image-view/image-view';
 import { TopicReplyList } from '../topic-reply-list/topic-reply-list';
+import { AppErrorService } from '../../shared/services/app-error/app-error.service';
 
 export type TopicReplies = Array<TopicReplyData>
 
@@ -44,10 +45,11 @@ export type TopicReplies = Array<TopicReplyData>
 })
 export class ReplyWindow {
 
-    public sessionService = inject(SessionService);
-    public topicService   = inject(TopicService);
-    public topicUuid      = input.required<string>();
-    public dialog         = inject(MatDialog);
+    public sessionService  = inject(SessionService);
+    public topicService    = inject(TopicService);
+    public topicUuid       = input.required<string>();
+    public dialog          = inject(MatDialog);
+    public appErrorService = inject(AppErrorService);
 
     public sessionId        = computed(() => this.sessionService.session().id );
     public topic            = signal<TopicWithReplies|null>(null);
@@ -252,7 +254,8 @@ export class ReplyWindow {
                     this.topicResource.reload()
                 },
                 error: (error) => {
-                    console.error('Topics Request failed', error);
+                    //console.error('Topics Request failed', error);
+                    this.appErrorService.setApiError(error)
                 }
             })
 

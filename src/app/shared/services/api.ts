@@ -153,9 +153,9 @@ export class ApiService {
                     console.error('request args', args)
 
                     if (error.error instanceof ErrorEvent) {
-                      console.error('Client-side error:', error.error.message);
+                        console.error('Client-side error:', error.error.message);
                     } else {
-                      console.error(`Backend returned code ${error.status}, body was: ${error.error}`);
+                        console.error(`Backend returned code ${error.status}, body was: ${error.error}`);
                     }
 
                     return throwError( () => error )
