@@ -1,17 +1,12 @@
-import { 
-    localizeDateTime, 
-    eceDecrypt, 
-    eceEncrypt, 
-    genNonce, 
-    getUtc,
-    signTokens,
+import {
+    localizeDateTime,
+    eceDecrypt,
+    eceEncrypt,
 } from "../utils"
-//import { TopicReply } from "./topic-reply.model"
-import base64url from "base64url";
 
-export type ReplyCommentData = {                       
-  comment?: string,
-  updated?: string
+export type ReplyCommentData = {
+    comment?: string,
+    updated?: string
 }
 
 export class NewReplyComment {
@@ -21,15 +16,19 @@ export class NewReplyComment {
     public data!: string;
     public decryptedData?:  ReplyCommentData;
 
-    constructor(params: Partial<ReplyComment> = {}) {
-      Object.assign(this, params);
+    constructor(
+        params: Partial<ReplyComment> = {}
+    ) {
+        Object.assign(this, params);
     }
 
 
-    public async encryptData(secret: string): Promise<void> {
+    public async encryptData(
+        secret: string
+    ): Promise<void> {
 
         if ( typeof this.decryptedData !== 'object' ) {
-           return
+            return
         }
 
         const serializedData = JSON.stringify(this.decryptedData);
@@ -50,7 +49,9 @@ export class ReplyComment {
     public data!:  string;
     public decryptedData?:  ReplyCommentData;
 
-    constructor(params: Partial<ReplyComment> = {}) {
+    constructor(
+        params: Partial<ReplyComment> = {}
+    ) {
       Object.assign(this, params);
     }
 
@@ -63,18 +64,19 @@ export class ReplyComment {
     }
 
 
-    public async decryptData(secret: string): Promise<ReplyCommentData> {
+    public async decryptData(
+        secret: string
+    ): Promise<ReplyCommentData> {
 
         if ( typeof this.decryptedData === 'object' ) {
-           console.log('already decrypted')
            return this.decryptedData
         }
 
         const data =  await eceDecrypt(this.data, secret)
-   
+
         this.decryptedData = JSON.parse( data ) as ReplyCommentData
 
-        return this.decryptedData 
+        return this.decryptedData
     }
 
 }

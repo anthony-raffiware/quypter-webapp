@@ -16,7 +16,9 @@ export class AppErrorService {
 
     public appError = signal<QCAppError | null>(null);
 
-    public setApiError(error: HttpErrorResponse) {
+    public setApiError(
+        error: HttpErrorResponse
+    ) {
 
         // client error
         if (error.error instanceof ErrorEvent) {
@@ -49,7 +51,10 @@ export class AppErrorService {
     }
 
 
-    public setError( msg: string, header: string = 'Error' ) {
+    public setError(
+        msg: string,
+        header: string = 'Error'
+    ) {
 
         const appError: QCAppError = {
             msg: msg,
