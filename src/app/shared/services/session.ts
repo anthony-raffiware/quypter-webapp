@@ -32,9 +32,9 @@ export type SessionData = {
 @Service()
 export class SessionService {
 
-    private apiService      = inject(ApiService);
-    private storageService  = inject(LocalStorageService);
-    private appErrorService = inject(AppErrorService);
+    private readonly apiService      = inject(ApiService);
+    private readonly storageService  = inject(LocalStorageService);
+    private readonly appErrorService = inject(AppErrorService);
 
     private sessionData:  SessionData = {};
 
@@ -51,7 +51,6 @@ export class SessionService {
             requireSync: true
         });
 
-
         this.loadOrCreateSession()
     }
 
@@ -64,11 +63,13 @@ export class SessionService {
             this.checkSession( sessionData.id as string )
                 .subscribe({
                     next: (response) => {
+
+                        console.log('found session')
+
                         this.sessionData = sessionData;
 
                         this.sessionLoaded$.next(true);
                         this.session$.next(sessionData);
-                        console.log('found session')
                     },
                     error: (error: HttpErrorResponse) => {
                         this.appErrorService.setApiError(error)
@@ -134,7 +135,7 @@ export class SessionService {
         const { publicKey, privateKey } = await createEd25519Keys();
 
         this.sessionData.session_priv_key = await exportKeyEncoded(privateKey)
-        this.sessionData.session_pub_key = await exportKeyEncoded(publicKey)
+        this.sessionData.session_pub_key  = await exportKeyEncoded(publicKey)
 
         const newSession: NewSession = {
            pub_key: this.sessionData.session_pub_key

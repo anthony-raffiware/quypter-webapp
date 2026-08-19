@@ -63,8 +63,8 @@ export class QCApiCollectionObj<T=any> {
 @Service()
 export class ApiService {
 
-    private apiURL = environment.apiUrl;
-    private http = inject(HttpClient);
+    private readonly apiURL = environment.apiUrl;
+    private readonly http = inject(HttpClient);
 
 
     public getObject<T>(

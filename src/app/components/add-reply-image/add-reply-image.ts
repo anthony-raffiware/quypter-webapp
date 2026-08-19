@@ -57,24 +57,21 @@ export class AddReplyImage {
 
     @ViewChild('canvasContainer') canvas!: ElementRef<HTMLCanvasElement>;
 
-    readonly dialogRef    = inject(MatDialogRef<AddReplyImage>);
-    readonly data         = inject<DialogData>(MAT_DIALOG_DATA);
-    readonly domSanitizer = inject(DomSanitizer);
+    private readonly dialogRef    = inject(MatDialogRef<AddReplyImage>);
+    private readonly domSanitizer = inject(DomSanitizer);
 
-    readonly imageData    = signal<string>('');
-    readonly thumbData    = signal<string>('');
-    readonly imageType    = signal<string>('');
-    readonly imageName    = signal<string>('');
-    readonly imageSize    = signal<number>(0);
-    readonly imageCaption = model<string|undefined>(undefined);
-
-
-    public loadingImage  = signal<boolean>(false)
-    public imageError    = signal<string>('')
-    public safeImageData = computed(() =>
+    readonly imageData     = signal<string>('');
+    readonly thumbData     = signal<string>('');
+    readonly imageType     = signal<string>('');
+    readonly imageName     = signal<string>('');
+    readonly imageSize     = signal<number>(0);
+    readonly loadingImage  = signal<boolean>(false)
+    readonly imageError    = signal<string>('')
+    readonly imageCaption  = model<string|undefined>(undefined);
+    readonly safeImageData = computed(() =>
         this.domSanitizer.bypassSecurityTrustResourceUrl(this.thumbData())
     );
-    public returnData: Signal<ImageReply> = computed(() => {
+    readonly returnData: Signal<ImageReply> = computed(() => {
         return {
             "name":    this.imageName(),
             "type":    this.imageType(),

@@ -51,15 +51,14 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class NewTopicWindow {
 
-    topicForm!: FormGroup;
+    readonly topicForm!: FormGroup;
+    readonly matcher = new MyErrorStateMatcher();
 
-    public matcher = new MyErrorStateMatcher();
-
-    private sessionService  = inject(SessionService);
-    private topicService    = inject(TopicService);
-    private appErrorService = inject(AppErrorService);
-    private router          = inject(Router);
-    private route           = inject(ActivatedRoute);
+    private readonly sessionService  = inject(SessionService);
+    private readonly topicService    = inject(TopicService);
+    private readonly appErrorService = inject(AppErrorService);
+    private readonly router          = inject(Router);
+    private readonly route           = inject(ActivatedRoute);
 
 
     constructor() {

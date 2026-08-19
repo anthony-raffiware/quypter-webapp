@@ -39,22 +39,23 @@ import { environment } from '../../../environments/environment';
 })
 export class TopicWindow {
 
-    public topicService     = inject(TopicService);
-    public sessionService   = inject(SessionService);
-    public clipBoardService = inject(Clipboard);
-    public document         = inject(DOCUMENT);
+    private readonly topicService     = inject(TopicService);
+    private readonly sessionService   = inject(SessionService);
+    private readonly clipBoardService = inject(Clipboard);
+    private readonly document         = inject(DOCUMENT);
 
-    public topicUuid = input.required<string>();
+    readonly topicUuid = input.required<string>();
 
-    public sessionId        = computed(() => this.sessionService.session().id );
-    public topic            = signal<Topic|null>(null);
-    public replyUrl         = signal<string|null>(null);
-    public decryptedReplies = signal<Array<TopicReply>>([]);
-    public loadingReplies   = signal<boolean>(false)
+    readonly topic            = signal<Topic|null>(null);
+    readonly replyUrl         = signal<string|null>(null);
+    readonly decryptedReplies = signal<Array<TopicReply>>([]);
+    readonly loadingReplies   = signal<boolean>(false)
 
-    private replyLimit      = signal<number>(5);
-    private replyLastId     = signal<string|null>(null);
-    private replyLastTs     = signal<string|null>(null);
+    private readonly replyLimit  = signal<number>(5);
+    private readonly replyLastId = signal<string|null>(null);
+    private readonly replyLastTs = signal<string|null>(null);
+
+    readonly sessionId = computed(() => this.sessionService.session().id );
 
     private urlBase!: string;
     private urlCopied: boolean = false;

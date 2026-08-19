@@ -22,7 +22,7 @@ import { TopicService } from '../../shared/services/topic';
 })
 export class TopicList {
 
-    public topicService = inject(TopicService);
+    readonly topicService = inject(TopicService);
 
     constructor() {
         this.topicService.topics.reload()

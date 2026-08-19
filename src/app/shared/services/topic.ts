@@ -44,12 +44,12 @@ export type TopicRepliesSecretData = {
 @Service()
 export class TopicService {
 
-    private apiService     = inject(ApiService);
-    private storageService = inject(LocalStorageService);
-    private sessionService = inject(SessionService);
+    private readonly apiService     = inject(ApiService);
+    private readonly storageService = inject(LocalStorageService);
+    private readonly sessionService = inject(SessionService);
 
-    public decryptedTopics = signal<Array<Topic> | null>(null);
-    public topicMap        = signal<{ [name:string]: Topic}>({})
+    readonly decryptedTopics = signal<Array<Topic> | null>(null);
+    readonly topicMap        = signal<{ [name:string]: Topic}>({})
 
     readonly topics = rxResource({
         stream: () => {

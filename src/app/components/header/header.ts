@@ -24,9 +24,9 @@ import { SessionService } from '../../shared/services/session';
 })
 export class Header {
 
-    public sessionService = inject(SessionService);
+    private readonly sessionService = inject(SessionService);
 
-    public sessionId    = computed(() => this.sessionService.session().id );
-    public sessionKeyId = computed(() => this.sessionService.session().key_id );
+    readonly sessionId    = computed(() => this.sessionService.session().id );
+    readonly sessionKeyId = computed(() => this.sessionService.session().key_id );
 
 }

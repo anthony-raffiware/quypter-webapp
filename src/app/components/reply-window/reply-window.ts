@@ -22,7 +22,6 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatDialog } from '@angular/material/dialog';
 
 import { rxResource } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap, of, from } from 'rxjs';
 
 import { TopicService } from '../../shared/services/topic';
@@ -55,29 +54,27 @@ export type TopicReplies = Array<TopicReplyData>
 })
 export class ReplyWindow {
 
-    public sessionService  = inject(SessionService);
-    public topicService    = inject(TopicService);
-    public topicUuid       = input.required<string>();
-    public dialog          = inject(MatDialog);
-    public appErrorService = inject(AppErrorService);
+    private readonly sessionService  = inject(SessionService);
+    private readonly topicService    = inject(TopicService);
+    private readonly dialog          = inject(MatDialog);
+    private readonly appErrorService = inject(AppErrorService);
 
-    public sessionId        = computed(() => this.sessionService.session().id );
-    public topic            = signal<TopicWithReplies|null>(null);
-    public decryptedReplies = signal<Array<TopicReply>>([]);
-    public loadingReplies   = signal<boolean>(false)
+    readonly topicUuid       = input.required<string>();
 
-    public imageData = signal<string>('');
-    public imageType = model<string>();
+    readonly topic            = signal<TopicWithReplies|null>(null);
+    readonly decryptedReplies = signal<Array<TopicReply>>([]);
+    readonly loadingReplies   = signal<boolean>(false)
+    readonly imageData        = signal<string>('');
+    readonly imageType        = model<string>();
+    readonly sessionId        = computed(() => this.sessionService.session().id );
 
+    readonly messageReplyForm!: FormGroup;
+    readonly matcher = new QCErrorStateMatcher();
 
-    messageReplyForm!: FormGroup;
-    matcher = new QCErrorStateMatcher();
-
-    private replyLimit  = signal<number>(5);
-    private replyLastId = signal<string|null>(null);
-    private replyLastTs = signal<string|null>(null);
-
-    private topicResource = rxResource({
+    private readonly replyLimit    = signal<number>(5);
+    private readonly replyLastId   = signal<string|null>(null);
+    private readonly replyLastTs   = signal<string|null>(null);
+    private readonly topicResource = rxResource({
         params: () => ({
             sessionId: this.sessionId(),
             topicId: this.topicUuid(),
@@ -256,7 +253,7 @@ export class ReplyWindow {
                     newTopicReply.session_key_id = this.sessionService.sessionKeyId as string
 
                     return from(this.topicService.createTopicReply(topic, newTopicReply))
-                        .pipe( switchMap( (s) => { return s }))
+                           .pipe( switchMap( (s) => { return s }))
                 })
             )
             .subscribe({

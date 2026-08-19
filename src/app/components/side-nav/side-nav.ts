@@ -9,5 +9,5 @@ import {MatTabsModule, MatTabNavPanel} from '@angular/material/tabs';
   styleUrl: './side-nav.scss',
 })
 export class SideNav {
-    tabPanel = input.required<MatTabNavPanel>();
+    readonly tabPanel = input.required<MatTabNavPanel>();
 }

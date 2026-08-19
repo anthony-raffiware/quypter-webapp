@@ -57,28 +57,29 @@ import { AppErrorService } from '../../shared/services/app-error/app-error.servi
 })
 export class TopicReplyList {
 
-    public  dialog          = inject(MatDialog);
-    private sessionService  = inject(SessionService);
-    private topicService    = inject(TopicService);
-    private appErrorService = inject(AppErrorService);
+    private readonly dialog          = inject(MatDialog);
+    private readonly sessionService  = inject(SessionService);
+    private readonly topicService    = inject(TopicService);
+    private readonly appErrorService = inject(AppErrorService);
 
 
     @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-    public decryptedReplies = model.required<Array<TopicReply>>();
-    public loadingReplies   = input.required<boolean>();
-    public showIdenticon    = input<boolean>(true);
-    public commentAction    = input<boolean>(false);
+    readonly decryptedReplies = model.required<Array<TopicReply>>();
+    readonly loadingReplies   = input.required<boolean>();
+    readonly showIdenticon    = input<boolean>(true);
+    readonly commentAction    = input<boolean>(false);
 
-    public endOfScrollOut = output<Event>();
+    readonly endOfScrollOut = output<Event>();
 
-    public sessionId      = computed(() => this.sessionService.session().id );
-    public  addingComment = signal<string|null>(null)
-    private endOfScroll   = signal<Event|null>(null)
-    private debouncedEndOfScroll = debounced(() => this.endOfScroll(), 500);
+    readonly sessionId     = computed(() => this.sessionService.session().id );
+    readonly addingComment = signal<string|null>(null)
 
-    public matcher = new QCErrorStateMatcher();
-    public commentForm!: FormGroup;
+    private readonly endOfScroll   = signal<Event|null>(null)
+    private readonly debouncedEndOfScroll = debounced(() => this.endOfScroll(), 500);
+
+    readonly matcher = new QCErrorStateMatcher();
+    readonly commentForm!: FormGroup;
 
     constructor() {
 

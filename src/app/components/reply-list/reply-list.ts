@@ -21,7 +21,7 @@ import { NgxJdenticonModule } from 'ngx-jdenticon';
 })
 export class ReplyList {
 
-    public topicService = inject(TopicService);
+    readonly topicService = inject(TopicService);
 
     constructor() {
         this.topicService.replies.reload()

@@ -38,9 +38,9 @@ export interface ImageDialogData {
 })
 export class ImageView {
 
-    readonly dialogRef    = inject(MatDialogRef<ImageView>);
-    readonly data         = inject<ImageDialogData>(MAT_DIALOG_DATA);
-    readonly domSanitizer = inject(DomSanitizer);
+    private readonly dialogRef    = inject(MatDialogRef<ImageView>);
+    private readonly data         = inject<ImageDialogData>(MAT_DIALOG_DATA);
+    private readonly domSanitizer = inject(DomSanitizer);
 
     readonly imageData    = signal<string>(this.data.imageData);
 
