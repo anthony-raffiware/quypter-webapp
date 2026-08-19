@@ -1,14 +1,19 @@
-import { Component, inject, computed, effect } from '@angular/core';
-import { AppErrorService } from './app-error.service';
+import { Component, inject, computed, effect, signal } from '@angular/core';
+import { AppErrorService, QCAppError } from './app-error.service';
 import { MatButtonModule } from '@angular/material/button';
 import {
-  MatDialog,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogTitle,
+    MatDialog,
+    MatDialogRef,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogContent,
+    MatDialogTitle,
+    MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 
+export interface DialogData {
+  error: QCAppError;
+}
 
 @Component({
   selector: 'app-app-error',
@@ -31,7 +36,9 @@ export class AppError {
 
             if ( error ) {
                 console.log('Got Error', error)
-                this.dialog.open(AppErrorDialog);
+                this.dialog.open(AppErrorDialog, {
+                    data: {error: error},
+                });
             }
         })
 
@@ -42,6 +49,19 @@ export class AppError {
 @Component({
   selector: 'app-app-error-dialog',
   templateUrl: 'app-app-error-dialog.html',
-  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatButtonModule],
+  imports: [
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
+    MatButtonModule,
+  ],
 })
-export class AppErrorDialog {}
+export class AppErrorDialog {
+
+  readonly dialogRef = inject(MatDialogRef<AppErrorDialog>);
+  readonly data      = inject<DialogData>(MAT_DIALOG_DATA);
+  readonly error     = signal(this.data.error);
+
+
+}
