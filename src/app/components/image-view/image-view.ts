@@ -45,7 +45,8 @@ export class ImageView {
     readonly imageData    = signal<string>(this.data.imageData);
 
     public safeImageData = computed(() =>
-        this.domSanitizer.bypassSecurityTrustResourceUrl(this.imageData())
+        this.imageData()
+        //this.domSanitizer.bypassSecurityTrustUrl(this.imageData())
     );
 
 }

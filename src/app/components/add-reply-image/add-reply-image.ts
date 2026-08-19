@@ -69,7 +69,8 @@ export class AddReplyImage {
     readonly imageError    = signal<string>('')
     readonly imageCaption  = model<string|undefined>(undefined);
     readonly safeImageData = computed(() =>
-        this.domSanitizer.bypassSecurityTrustResourceUrl(this.thumbData())
+        this.thumbData()
+        //this.domSanitizer.bypassSecurityTrustResourceUrl(this.thumbData())
     );
     readonly returnData: Signal<ImageReply> = computed(() => {
         return {
