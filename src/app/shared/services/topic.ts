@@ -130,13 +130,12 @@ export class TopicService {
 
         const { publicKey, privateKey } = await createX25519Keys();
         const aesSecret      = await generateAesKey();
-        const topicPrivKey = await exportKeyEncoded(privateKey)
-        const topicPubKey  = await exportKeyEncoded(publicKey)
+        const topicPrivKey   = await exportKeyEncoded(privateKey)
+        const topicPubKey    = await exportKeyEncoded(publicKey)
         const sessionPrivKey = await loadPrivateKey(this.sessionService.sessionPrivKey)
         const path = sprintf('/session/%s/new_topic', newTopic.session_id )
 
         newTopic.topic_pub_key = topicPubKey
-        newTopic.topic_pub_key_sig = 'PLACEHOLDER'
 
         await newTopic.encryptData(aesSecret)
         await newTopic.signTopicKey(sessionPrivKey)
@@ -157,39 +156,6 @@ export class TopicService {
             )
     }
 
-    // public fetchTopic(
-    //    topicId: string
-    // ): Observable<QCApiResponse<Topic>> {
-
-    //     const path = sprintf('/topic/%s', topicId )
-
-    //     return this.sessionService.isSessionLoaded()
-    //         .pipe(
-    //             switchMap( (loaded) => {
-    //                return  this.apiService.get<Topic>(path)
-    //             }),
-    //             first()
-    //         )
-    // }
-
-    // public fetchSessionTopic(
-    //    sessionId: string,
-    //    topicId: string
-    // ): Observable<QCApiResponse<Topic>> {
-
-    //    const path = sprintf('/session/%s/topics/%s', sessionId, topicId )
-
-    //    return this.apiService.get<Topic>(path)
-    //         //.pipe(
-    //         //    tap( (topic) => {
-
-    //         //        const topicData = this.getTopicData(topic.data.id)
-    //         //        const secret = topicData?.secretKey
-
-    //         //        await topic.data.decryptData(secret as string)
-    //         //    })
-    //         //)
-    // }
 
     public async decryptTopicCollection(
         resp: QCApiResponse<QCApiCollectionObj<Topic>>
@@ -259,7 +225,7 @@ export class TopicService {
     }
 
     public fetchReplies(
-       sessionId: string
+        sessionId: string
     ): Observable<QCApiResponse<QCApiCollectionObj<Topic>>> {
 
         const path = sprintf('/session/%s/replies', sessionId )
@@ -268,9 +234,9 @@ export class TopicService {
     }
 
     public fetchTopicWithRecvReplies(
-       sessionId: string ,
-       topicId: string ,
-       options?: HttpClientCommonOptions
+        sessionId: string ,
+        topicId: string ,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<TopicWithReplies>> {
 
         const path = sprintf('/session/%s/topics/%s', sessionId, topicId )
@@ -303,9 +269,9 @@ export class TopicService {
     }
 
     public fetchTopicWithSentReplies(
-       sessionId: string ,
-       topicId: string ,
-       options?: HttpClientCommonOptions
+        sessionId: string ,
+        topicId: string ,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<TopicWithReplies>> {
 
         const path = sprintf('/session/%s/replies/%s', sessionId, topicId )
@@ -343,7 +309,7 @@ export class TopicService {
         const path = sprintf('/topic/%s/send_reply', topic.id );
 
         newTopicReply.topic_reply_pub_key = topic_reply_pub_key
-        newTopicReply.topic_reply_pub_key_sig = 'PLACEHOLDER'
+        //newTopicReply.topic_reply_pub_key_sig = 'PLACEHOLDER'
 
         await newTopicReply.encryptData(sharedSecret)
         await newTopicReply.signReplyKey(sessionId, sessionPrivKey)
@@ -404,39 +370,22 @@ export class TopicService {
     ): Promise<Observable<QCApiResponse<ReplyComment>>> {
 
         const sessionId      = this.sessionService.sessionId;
-        //const sessionPrivKey = await loadPrivateKey(this.sessionService.sessionPrivKey)
-
-        //const { publicKey, privateKey } = await createX25519Keys();
-        //const topicPubKey          = await loadPublicKey(topic.topic_pub_key, "x25519");
-
         const topicReplyData = this.getTopicReplyData(newReplyComment.topic_reply_id)
         const topicId        = topicReplyData?.topicId as string;
         const sharedSecret   = topicReplyData?.sharedSecretKey as string;
 
         const path = sprintf('/session/%s/topics/%s/add_comment', sessionId, topicId );
 
-        console.log(newReplyComment.topic_reply_id)
-        console.log(topicReplyData)
         try {
             await newReplyComment.encryptData(sharedSecret)
         }
         catch (error: unknown) {
-          console.error(error);
+            console.error(error);
 
-          // if (error instanceof Error) {
-          //   console.error(error.message);
-          // } else {
-          //   console.error('Unknown error:', error);
-          // }
-          throw error
+            throw error
         }
 
         return this.apiService.post<ReplyComment>(path, newReplyComment )
-                   //.pipe(
-                   //     switchMap((newCommentResp) => {
-
-                   //     })
-                   //)
     }
 
 }
