@@ -8,11 +8,11 @@ import {
     model
 } from '@angular/core';
 import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormsModule,
-  ReactiveFormsModule,
+    FormGroup,
+    FormBuilder,
+    Validators,
+    FormsModule,
+    ReactiveFormsModule,
 } from '@angular/forms';
 
 import {MatInputModule} from '@angular/material/input';
