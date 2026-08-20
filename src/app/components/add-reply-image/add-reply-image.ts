@@ -27,6 +27,8 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { ImageReply } from '../../shared/models/topic-reply.model';
 import { byteDisplayPipe } from '../../shared/utils';
+import { environment } from '../../../environments/environment';
+import { validateImageType } from '../../shared/utils';
 
 
 export interface DialogData {
@@ -68,10 +70,10 @@ export class AddReplyImage {
     readonly loadingImage  = signal<boolean>(false)
     readonly imageError    = signal<string>('')
     readonly imageCaption  = model<string|undefined>(undefined);
-    readonly safeImageData = computed(() =>
-        this.thumbData()
-        //this.domSanitizer.bypassSecurityTrustResourceUrl(this.thumbData())
-    );
+    //readonly safeImageData = computed(() =>
+    //    this.thumbData()
+    //    //this.domSanitizer.bypassSecurityTrustResourceUrl(this.thumbData())
+    //);
     readonly returnData: Signal<ImageReply> = computed(() => {
         return {
             "name":    this.imageName(),
@@ -121,7 +123,7 @@ export class AddReplyImage {
 
             const file = files[0];
 
-            if ( file.size > 5000000 ) {
+            if ( file.size > environment.maxImageSize ) {
 
                 this.imageError.set('Image To Large')
                 this.loadingImage.set(false)
@@ -129,8 +131,9 @@ export class AddReplyImage {
                 return
             }
 
-            if ( !file.type.startsWith('image/') ) {
-
+            //  data:e image/jpeg image/png image/webp image/gif
+            // no  image/svg+xml
+            if ( !validateImageType(file) ) {
                 this.imageError.set('Invalid Image')
                 this.loadingImage.set(false)
 
@@ -152,18 +155,20 @@ export class AddReplyImage {
                    .then((thumbData) => {
 
                         comp.imageData.set(imageData);
-                        comp.thumbData.set(thumbData as string);
+                        comp.thumbData.set(thumbData);
                         comp.imageName.set(file.name);
                         comp.imageType.set(file.type);
                         comp.imageSize.set(file.size);
 
                         URL.revokeObjectURL(imageData);
+                        URL.revokeObjectURL(thumbData);
+
                    });
 
             };
 
             reader.onerror = function() {
-              console.error('Error reading file');
+                comp.imageError.set('Error Reading File')
             };
 
             reader.readAsDataURL(file)
@@ -182,7 +187,7 @@ export class AddReplyImage {
         maxWidth: number = 350
     ) {
 
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
 
             const canvas = this.canvas.nativeElement;
             const ctx    = canvas.getContext('2d');

@@ -36,7 +36,7 @@ import { ReplyComment, NewReplyComment } from '../../shared/models/reply-comment
 import { getUtc } from '../../shared/utils';
 import { SessionService } from '../../shared/services/session';
 import { TopicService } from '../../shared/services/topic';
-import { QCErrorStateMatcher } from '../../shared/utils';
+import { QCErrorStateMatcher, safeImagePipe } from '../../shared/utils';
 import { AppErrorService } from '../../shared/services/app-error/app-error.service';
 
 
@@ -50,7 +50,8 @@ import { AppErrorService } from '../../shared/services/app-error/app-error.servi
     MatFormFieldModule,
     MatProgressSpinnerModule,
     MatInputModule,
-    NgxJdenticonModule
+    NgxJdenticonModule,
+    safeImagePipe
   ],
   templateUrl: './topic-reply-list.html',
   styleUrl: './topic-reply-list.scss',
@@ -81,6 +82,7 @@ export class TopicReplyList {
     readonly matcher = new QCErrorStateMatcher();
     readonly commentForm!: FormGroup;
 
+
     constructor() {
 
         this.commentForm = new FormBuilder().group({
@@ -105,11 +107,11 @@ export class TopicReplyList {
     ): void {
 
         const imageDialogRef = this.dialog.open(ImageView, {
-          data: { imageData: imageReply.data },
-          width: '100%',
-          maxWidth: '100%',
-          height: '90%',
-          panelClass: 'custom-image-dialog-panel'
+            data: { imageData: imageReply.data },
+            width: '100%',
+            maxWidth: '100%',
+            height: '90%',
+            panelClass: 'custom-image-dialog-panel'
         });
 
     }

@@ -36,12 +36,12 @@
                         <p>{{  reply.getMessageData().message }}</p>
                         }
                         @else if ( reply.decryptedData?.type == 'image' ) {
-                            @let imageData =reply.getImageData();
+                            @let imageData = reply.getImageData();
                             <div class="px-3">
                                 <img
-                                   [src]="imageData.thumb"
+                                   [src]="imageData.thumb | safeImage "
                                    (click)="openViewImageDialog(imageData, $event )"
-                                   alt="Binary Image"
+                                   alt="Image"
                                 />
                                 @if (imageData.caption) {
                                   <p class="fst-italic my-0">{{ imageData.caption }}</p>

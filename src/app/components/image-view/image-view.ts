@@ -18,6 +18,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 
+import { safeImagePipe } from '../../shared/utils';
+
 export interface ImageDialogData {
   imageData: string;
 }
@@ -32,6 +34,7 @@ export interface ImageDialogData {
     MatDialogContent,
     MatIconModule,
     MatButtonToggleModule,
+    safeImagePipe
   ],
   templateUrl: './image-view.html',
   styleUrl: './image-view.scss',
@@ -43,10 +46,10 @@ export class ImageView {
     private readonly domSanitizer = inject(DomSanitizer);
 
     readonly imageData    = signal<string>(this.data.imageData);
+    readonly imageData2   = signal<string>(this.data.imageData);
 
     public safeImageData = computed(() =>
-        this.imageData()
-        //this.domSanitizer.bypassSecurityTrustUrl(this.imageData())
+        this.domSanitizer.bypassSecurityTrustUrl(this.imageData())
     );
 
 }

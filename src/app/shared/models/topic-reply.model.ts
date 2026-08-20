@@ -26,18 +26,18 @@ enum ImageFormats {
 }
 
 export type ImageReply = {
-    name:    string,
-    type:    string,
-    data:    string,
-    thumb:   string,
+    name:     string,
+    type:     string,
+    data:     string,
+    thumb:    string,
     caption?: string,
-    size:    number
+    size:     number
 }
 
 export type SigData = {
   signature: string,
-  date: string,
-  nonce: string
+  date:      string,
+  nonce:     string
 }
 
 export class NewTopicReply {

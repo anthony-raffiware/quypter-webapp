@@ -1,6 +1,7 @@
 import {
     Pipe,
-    PipeTransform
+    PipeTransform,
+    inject
 } from '@angular/core';
 
 import dayjs from 'dayjs'
@@ -11,11 +12,17 @@ import { Buffer } from 'buffer';
 import { encodings, encrypt, decrypt } from '@apeleghq/rfc8188';
 import {ErrorStateMatcher} from '@angular/material/core';
 import { FormControl, FormGroupDirective, NgForm, } from '@angular/forms';
-
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 dayjs.extend(timezone);
 dayjs.extend(utc)
 
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif'
+]
 const AES_GCM_KEY_LENGTH    = 128;
 const SECRET_KEY_BIT_LENGTH = 256;
 const SUBTLE = crypto.subtle;
@@ -568,3 +575,35 @@ export class byteDisplayPipe implements PipeTransform {
         return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
     }
 }
+
+
+@Pipe({ name: 'safeImage' })
+export class safeImagePipe implements PipeTransform {
+
+    private readonly sanitizer = inject(DomSanitizer)
+
+    transform(dataUrl: string): SafeResourceUrl {
+
+                                   // data:image/jpeg;base64
+        const match = dataUrl.match(/^data:(image\/[a-z]+);/)
+
+        if (!match) {
+           return '';
+        }
+
+        const type  = match[1];
+
+        if (!ALLOWED_IMAGE_TYPES.includes(type)) {
+            return ''
+        }
+
+        return this.sanitizer.bypassSecurityTrustResourceUrl(dataUrl);
+    }
+}
+
+
+export function validateImageType(
+    file: File,
+): boolean {
+    return ALLOWED_IMAGE_TYPES.includes(file.type);
+};
