@@ -38,10 +38,32 @@ export type SessionData = {
 
 
 @Service()
+export class SessionDataService {
+
+    private readonly storageService  = inject(LocalStorageService);
+
+    public loadLocalSessionData(): SessionData | undefined {
+
+        return this.storageService.getSerializedData('session_data') as SessionData
+    }
+
+
+    public saveLocalSessionData(sessionData: SessionData): void {
+        this.storageService.saveSerializedData('session_data', sessionData)
+    }
+
+
+    public clearLocalSessionData(): void {
+        this.storageService.removeData('session_data')
+    }
+}
+
+@Service()
 export class SessionService {
 
     private readonly apiService      = inject(ApiService);
-    private readonly storageService  = inject(LocalStorageService);
+    //private readonly storageService  = inject(LocalStorageService);
+    private readonly dataService     = inject(SessionDataService);
     private readonly appErrorService = inject(AppErrorService);
 
     private sessionData:  SessionData = {};
@@ -54,7 +76,7 @@ export class SessionService {
     constructor() {
 
         this.sessionLoaded$ = new BehaviorSubject<boolean>(false);
-        this.session$ = new BehaviorSubject<SessionData>({});
+        this.session$       = new BehaviorSubject<SessionData>({});
 
         this.session = toSignal(this.session$, {
             requireSync: true
@@ -117,6 +139,8 @@ export class SessionService {
         const newReq = request.clone({
             //headers: req.headers.append('X-Authentication-Token', authToken),
         });
+
+        console.log('In interceptor')
 
         return newReq
     }
@@ -200,17 +224,21 @@ export class SessionService {
 
     private loadLocalSessionData(): SessionData | undefined {
 
-        return this.storageService.getSerializedData('session_data') as SessionData
+        //return this.ses
+        return this.dataService.loadLocalSessionData()
+        //return this.storageService.getSerializedData('session_data') as SessionData
     }
 
 
     private saveLocalSessionData(): void {
-        this.storageService.saveSerializedData('session_data', this.sessionData)
+        this.dataService.saveLocalSessionData(this.sessionData)
+        //this.storageService.saveSerializedData('session_data', this.sessionData)
     }
 
 
     private clearLocalSessionData(): void {
-        this.storageService.removeData('session_data')
+        this.dataService.clearLocalSessionData()
+        //this.storageService.removeData('session_data')
         this.sessionData = {}
     }
 

@@ -13,7 +13,6 @@ import { encodings, encrypt, decrypt } from '@apeleghq/rfc8188';
 import {ErrorStateMatcher} from '@angular/material/core';
 import { FormControl, FormGroupDirective, NgForm, } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { transferableAbortSignal } from 'util';
 
 dayjs.extend(timezone);
 dayjs.extend(utc)
@@ -625,6 +624,7 @@ export function validateImageType(
 ): boolean {
     return ALLOWED_IMAGE_TYPES.includes(file.type);
 };
+
 
 export async function testSign() {
 

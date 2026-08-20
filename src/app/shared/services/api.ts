@@ -4,12 +4,22 @@ import {
     HttpClientCommonOptions,
     HttpErrorResponse,
     HttpRequest,
-    HttpHandlerFn
+    HttpHandlerFn,
+    HttpEvent
 } from '@angular/common/http';
-import { Observable, tap, catchError, throwError, first, switchMap, of } from 'rxjs';
+import {
+    Observable,
+    tap,
+    catchError,
+    throwError,
+    first,
+    switchMap,
+    of,
+    from,
+    lastValueFrom
+} from 'rxjs';
 import { sprintf } from 'sprintf-js';
 import { environment } from '../../../environments/environment';
-import { SessionService } from './session';
 
 type QCRequestFuncNoData<T> = (
     url:     string,
@@ -67,22 +77,32 @@ export class QCApiCollectionObj<T=any> {
 }
 
 
-export function reqSigningInterceptor(
-    req: HttpRequest<unknown>,
-    next: HttpHandlerFn
-) {
-
-    const session = inject(SessionService);
-    if (!session.sessionId) {
-        return next(req)
-    }
-
-    const newReq = req.clone({
-        //headers: req.headers.append('X-Authentication-Token', authToken),
-    });
-
-    return next(newReq);
-}
+// export function requestSigningInterceptor(
+//     req: HttpRequest<unknown>,
+//     next: HttpHandlerFn
+// ): Observable<HttpEvent<any>> {
+//
+//     // const session = inject(SessionService);
+//
+//     return next(req)
+//
+//     // if (!session.sessionId) {
+//     //     return next(req)
+//     // }
+//
+//     // return from(signRequest(req, next, session))
+// }
+//
+// async function signRequest(
+//     req: HttpRequest<unknown>,
+//     next: HttpHandlerFn,
+//     session: SessionService
+// ) {
+//
+//     const newReq = await session.signRequest(req)
+//
+//     return lastValueFrom(next(newReq));
+// }
 
 
 @Service()
