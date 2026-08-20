@@ -1,8 +1,15 @@
 import { Service, inject  } from '@angular/core';
-import { HttpClient,  HttpClientCommonOptions, HttpErrorResponse } from '@angular/common/http';
+import {
+    HttpClient,
+    HttpClientCommonOptions,
+    HttpErrorResponse,
+    HttpRequest,
+    HttpHandlerFn
+} from '@angular/common/http';
 import { Observable, tap, catchError, throwError, first, switchMap, of } from 'rxjs';
 import { sprintf } from 'sprintf-js';
 import { environment } from '../../../environments/environment';
+import { SessionService } from './session';
 
 type QCRequestFuncNoData<T> = (
     url:     string,
@@ -57,6 +64,24 @@ export class QCApiCollectionObj<T=any> {
         })
 
     }
+}
+
+
+export function reqSigningInterceptor(
+    req: HttpRequest<unknown>,
+    next: HttpHandlerFn
+) {
+
+    const session = inject(SessionService);
+    if (!session.sessionId) {
+        return next(req)
+    }
+
+    const newReq = req.clone({
+        //headers: req.headers.append('X-Authentication-Token', authToken),
+    });
+
+    return next(newReq);
 }
 
 

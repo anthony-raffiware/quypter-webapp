@@ -1,9 +1,8 @@
-import { Service, inject, signal, Signal } from '@angular/core';
+import { Service, inject, signal, Signal, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { ApiService, QCApiResponse } from './api';
 import { LocalStorageService } from './local-storage';
-import { catchError, throwError } from 'rxjs';
 import { sprintf } from 'sprintf-js';
 import {
     from,
@@ -12,11 +11,20 @@ import {
     Observable,
     BehaviorSubject,
     filter,
-    first
+    first,
+    catchError,
+    throwError
 } from 'rxjs';
 
 import { NewSession, Session } from '../models/session.model';
-import { createEd25519Keys, exportKeyEncoded } from '../utils';
+import {
+    createEd25519Keys,
+    exportKeyEncoded,
+    loadPrivateKey,
+    signTokens,
+    getUtc,
+    genNonce
+} from '../utils';
 import { AppErrorService } from './app-error/app-error.service';
 
 
@@ -38,9 +46,10 @@ export class SessionService {
 
     private sessionData:  SessionData = {};
 
-    sessionLoaded$: BehaviorSubject<boolean> ;
-    session$: BehaviorSubject<SessionData>;
-    session: Signal<SessionData>;
+    readonly sessionLoaded$: BehaviorSubject<boolean> ;
+    readonly session$: BehaviorSubject<SessionData>;
+    readonly session: Signal<SessionData>;
+
 
     constructor() {
 
@@ -85,6 +94,31 @@ export class SessionService {
     public isSessionLoaded() {
       // Don't emit until we have a true value.
        return this.sessionLoaded$.pipe( filter( loaded => loaded ), first() );
+    }
+
+
+    public async signRequest(
+        request: HttpRequest<unknown>
+    ): Promise<HttpRequest<unknown>> {
+
+        const privKeyEnc = this.sessionData.session_priv_key as string
+        const privKey    = await loadPrivateKey(privKeyEnc);
+
+        const uuid   = this.sessionData.id as string;
+        const nowUtc = getUtc()
+        const nonce  = genNonce()
+        const tokens = {
+            sessionUuid: uuid,
+            date: nowUtc,
+            nonce: nonce
+        }
+        const signature = await signTokens(tokens, privKey)
+
+        const newReq = request.clone({
+            //headers: req.headers.append('X-Authentication-Token', authToken),
+        });
+
+        return newReq
     }
 
     get sessionId() {

@@ -13,6 +13,7 @@ import { encodings, encrypt, decrypt } from '@apeleghq/rfc8188';
 import {ErrorStateMatcher} from '@angular/material/core';
 import { FormControl, FormGroupDirective, NgForm, } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { transferableAbortSignal } from 'util';
 
 dayjs.extend(timezone);
 dayjs.extend(utc)
@@ -390,6 +391,23 @@ export async function signTokens(
 }
 
 
+export async function verifyTokens(
+  tokens: Tokens,
+  sig:    string,
+  pk:     CryptoKey
+) {
+
+  const msg = generateMsgFromTokens(tokens);
+
+  return SUBTLE.verify(
+    "Ed25519",
+    pk,
+    base64UrlToBuf(sig),
+    msg,
+  );
+}
+
+
 /**
  * @param {Tokens} tokens  Token data
  *·
@@ -607,3 +625,43 @@ export function validateImageType(
 ): boolean {
     return ALLOWED_IMAGE_TYPES.includes(file.type);
 };
+
+export async function testSign() {
+
+
+    const { publicKey, privateKey } = await createEd25519Keys();
+
+    const uuid   = '82c2efea-7a36-4eac-83ec-e5ae27aaad43';
+    const nowUtc = getUtc()
+    const nonce  = genNonce()
+    const tokens = {
+        sessionUuid: uuid,
+        date: nowUtc,
+        nonce: nonce
+    }
+
+    const btokens = {
+        sessionUuid: uuid,
+        date: nowUtc,
+        nonce: genNonce()
+    }
+
+    const encPubKey =  await exportKeyEncoded(publicKey)
+    const signature = await signTokens(tokens, privateKey)
+
+    console.log(tokens, signature, encPubKey)
+
+    console.log(await verifyTokens(tokens, signature, publicKey))
+    console.log(await verifyTokens(btokens, signature, publicKey))
+
+    const staticTokens = {
+        sessionUuid: '82c2efea-7a36-4eac-83ec-e5ae27aaad43',
+        date: '2026-08-20 13:41:05 +00:00',
+        nonce: 'Jy2+qrSKYKLAkPYCdugJxslEgHSW1F6keAA8GXrDRjs='
+    }
+
+    console.log(generateMsgFromTokens(staticTokens))
+
+    //'_d2W1r5DGUxtWxFS-YgOdEj9N9rsKozXTZW2AzLjusbgmkqeunu3eTe3X0i7rmnIVpG7tHDC2kVSZTUuebQrAg' 'MCowBQYDK2VwAyEAB2V4r7cSqTC1zhzKEO5aTeD4Vp83xU0iUhDRufR4wqw'
+
+}
