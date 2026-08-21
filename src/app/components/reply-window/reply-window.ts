@@ -7,6 +7,7 @@ import {
     computed,
     model
 } from '@angular/core';
+import { HttpErrorResponse, } from '@angular/common/http';
 import {
     FormGroup,
     FormBuilder,
@@ -22,7 +23,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatDialog } from '@angular/material/dialog';
 
 import { rxResource } from '@angular/core/rxjs-interop';
-import { switchMap, of, from } from 'rxjs';
+import { switchMap, of, from, catchError, Observable, throwError } from 'rxjs';
 
 import { TopicService } from '../../shared/services/topic';
 import { SessionService } from '../../shared/services/session';
@@ -103,10 +104,19 @@ export class ReplyWindow {
             }
 
             return this.topicService.fetchTopicWithSentReplies(
-                params.sessionId,
-                params.topicId,
-                options
-            )
+                    params.sessionId,
+                    params.topicId,
+                    options
+                )
+                .pipe(
+                    catchError( (error: HttpErrorResponse): Observable<any> => {
+                        this.appErrorService.setApiError(error)
+
+                        return throwError( () => error )
+
+                    })
+                )
+
         }
     });
 

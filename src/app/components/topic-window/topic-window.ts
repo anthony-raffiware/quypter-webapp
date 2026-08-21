@@ -7,10 +7,12 @@ import {
     computed,
     DOCUMENT
 } from '@angular/core';
+import { HttpErrorResponse, } from '@angular/common/http';
+
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Clipboard } from '@angular/cdk/clipboard';
 
-import { of } from 'rxjs';
+import { of, catchError, Observable, throwError } from 'rxjs';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,6 +26,7 @@ import { Topic } from '../../shared/models/topic.model';
 import { TopicReplyList } from '../topic-reply-list/topic-reply-list';
 import { TopicReply } from '../../shared/models/topic-reply.model';
 import { environment } from '../../../environments/environment';
+import { AppErrorService } from '../../shared/services/app-error/app-error.service';
 
 
 @Component({
@@ -43,6 +46,8 @@ export class TopicWindow {
     private readonly sessionService   = inject(SessionService);
     private readonly clipBoardService = inject(Clipboard);
     private readonly document         = inject(DOCUMENT);
+    private readonly appErrorService  = inject(AppErrorService);
+
 
     readonly topicUuid = input.required<string>();
 
@@ -89,10 +94,19 @@ export class TopicWindow {
             }
 
             return this.topicService.fetchTopicWithRecvReplies(
-                params.sessionId,
-                params.topicId,
-                options
-            )
+                   params.sessionId,
+                   params.topicId,
+                   options
+                )
+                .pipe(
+                    catchError( (error: HttpErrorResponse): Observable<any> => {
+                        this.appErrorService.setApiError(error)
+
+                        return throwError( () => error )
+
+                    })
+                )
+
         }
     });
 

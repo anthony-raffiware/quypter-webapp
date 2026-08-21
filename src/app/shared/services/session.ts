@@ -149,10 +149,11 @@ export class SessionService {
                     this.sessionData.key_id = response.data.key_id
                     this.sessionData.created_ts = response.data.key_id
 
+                    this.saveLocalSessionData()
+
                     this.sessionLoaded$.next(true);
                     this.session$.next(this.sessionData)
 
-                    this.saveLocalSessionData()
                 },
                 error: (error) => {
                     this.appErrorService.setApiError(error)
@@ -198,21 +199,18 @@ export class SessionService {
 
     private loadLocalSessionData(): SessionData | undefined {
 
-        //return this.ses
         return this.dataService.loadLocalSessionData()
-        //return this.storageService.getSerializedData('session_data') as SessionData
     }
 
 
     private saveLocalSessionData(): void {
         this.dataService.saveLocalSessionData(this.sessionData)
-        //this.storageService.saveSerializedData('session_data', this.sessionData)
     }
 
 
     private clearLocalSessionData(): void {
+
         this.dataService.clearLocalSessionData()
-        //this.storageService.removeData('session_data')
         this.sessionData = {}
     }
 
