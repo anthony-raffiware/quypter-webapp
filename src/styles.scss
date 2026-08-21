@@ -72,7 +72,7 @@ body {
 
   // Reset the user agent margin.
   margin: 0;
-  height: 100%;
+  //height: 100%;
 }
 /* You can add global styles to this file, and also import other style files */
 :root {
@@ -107,6 +107,23 @@ $footer-height: 70px;
 
 $main-height-offset: $header-height; //15 ; // $footer-height;
 
+.scroll-hidden {
+  /* 1. Enable scrolling */
+  overflow-y: scroll;
+
+  /* 2. Hide for Firefox */
+  //scrollbar-width: 0px;
+
+  /* 3. Hide for Internet Explorer and Edge Legacy */
+  -ms-overflow-style: none;
+
+  /* 4. Hide for Chrome, Safari, and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+  }
+}
+
 .qc_header {
   background: var(--active-nav-color);
   margin-left: 0px;
@@ -117,7 +134,7 @@ $main-height-offset: $header-height; //15 ; // $footer-height;
 }
 
 div.gc-main {
-  height: calc(100vh - #{$main-height-offset});
+  min-height: calc(100vh - #{$main-height-offset});
   margin-left: 0px;
   margin-right: 0px;
   margin-bottom: 0px;

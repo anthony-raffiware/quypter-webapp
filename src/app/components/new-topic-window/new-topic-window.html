@@ -3,8 +3,13 @@
     <form class="topic-form" [formGroup]="topicForm" (ngSubmit)="onSubmit()">
       <mat-form-field class="topic-full-width">
         <mat-label>Topic</mat-label>
-        <input  matInput formControlName="subject" [errorStateMatcher]="matcher"
-               placeholder="Ex. My secret messages">
+        <input
+            maxlength="20"
+            matInput
+            formControlName="subject"
+            [errorStateMatcher]="matcher"
+            placeholder="Ex. My secret messages"
+        >
         @if (topicForm.get('subject')?.hasError('required')) {
           <mat-error>Topic is <strong>required</strong></mat-error>
         }
