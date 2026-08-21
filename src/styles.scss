@@ -111,7 +111,8 @@ $main-height-offset: $header-height; //15 ; // $footer-height;
   /* 1. Enable scrolling */
   overflow-y: scroll;
 
-  /* 2. Hide for Firefox */
+  /* 2. Hide for Firefox, doesn't work and breaks
+        chrome ?! */
   //scrollbar-width: 0px;
 
   /* 3. Hide for Internet Explorer and Edge Legacy */

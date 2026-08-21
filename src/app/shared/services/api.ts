@@ -77,34 +77,6 @@ export class QCApiCollectionObj<T=any> {
 }
 
 
-// export function requestSigningInterceptor(
-//     req: HttpRequest<unknown>,
-//     next: HttpHandlerFn
-// ): Observable<HttpEvent<any>> {
-//
-//     // const session = inject(SessionService);
-//
-//     return next(req)
-//
-//     // if (!session.sessionId) {
-//     //     return next(req)
-//     // }
-//
-//     // return from(signRequest(req, next, session))
-// }
-//
-// async function signRequest(
-//     req: HttpRequest<unknown>,
-//     next: HttpHandlerFn,
-//     session: SessionService
-// ) {
-//
-//     const newReq = await session.signRequest(req)
-//
-//     return lastValueFrom(next(newReq));
-// }
-
-
 @Service()
 export class ApiService {
 

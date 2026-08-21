@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "quick-crypt-webapp": {
+    "quypter-webapp": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -89,10 +89,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "quick-crypt-webapp:build:production"
+              "buildTarget": "quypter-webapp:build:production"
             },
             "development": {
-              "buildTarget": "quick-crypt-webapp:build:development"
+              "buildTarget": "quypter-webapp:build:development"
             }
           },
           "defaultConfiguration": "development"
