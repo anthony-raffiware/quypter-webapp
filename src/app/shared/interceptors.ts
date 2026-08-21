@@ -56,7 +56,7 @@ async function signRequest(
     }
     const signature = await signTokens(tokens, privKey)
 
-    const newRequest = request.clone({
+    const signedRequest = request.clone({
         headers: request.headers
             .append('X-QCS-Signature', signature)
             .append('X-QCS-TimeStamp', nowUtc)
@@ -64,6 +64,6 @@ async function signRequest(
 
     });
 
-    return lastValueFrom(next(newRequest));
+    return lastValueFrom(next(signedRequest));
 }
 

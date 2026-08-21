@@ -70,10 +70,7 @@ export class AddReplyImage {
     readonly loadingImage  = signal<boolean>(false)
     readonly imageError    = signal<string>('')
     readonly imageCaption  = model<string|undefined>(undefined);
-    //readonly safeImageData = computed(() =>
-    //    this.thumbData()
-    //    //this.domSanitizer.bypassSecurityTrustResourceUrl(this.thumbData())
-    //);
+
     readonly returnData: Signal<ImageReply> = computed(() => {
         return {
             "name":    this.imageName(),
@@ -131,8 +128,6 @@ export class AddReplyImage {
                 return
             }
 
-            //  data:e image/jpeg image/png image/webp image/gif
-            // no  image/svg+xml
             if ( !validateImageType(file) ) {
                 this.imageError.set('Invalid Image')
                 this.loadingImage.set(false)

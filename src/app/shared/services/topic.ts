@@ -309,7 +309,6 @@ export class TopicService {
         const path = sprintf('/topic/%s/send_reply/%s', topic.id, sessionId );
 
         newTopicReply.topic_reply_pub_key = topic_reply_pub_key
-        //newTopicReply.topic_reply_pub_key_sig = 'PLACEHOLDER'
 
         await newTopicReply.encryptData(sharedSecret)
         await newTopicReply.signReplyKey(sessionId, sessionPrivKey)

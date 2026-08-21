@@ -17,6 +17,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 dayjs.extend(timezone);
 dayjs.extend(utc)
 
+// Never allow svg. CSRF vector
 const ALLOWED_IMAGE_TYPES = [
   'image/jpeg',
   'image/png',
@@ -258,6 +259,7 @@ const ArrayBufferToUint8ArrayStream = (
         start() {},
         transform(chunk, controller) {
             if (ArrayBuffer.isView(chunk)) {
+
                 controller.enqueue(
                     new Uint8Array(
                         chunk.buffer,
@@ -265,7 +267,8 @@ const ArrayBufferToUint8ArrayStream = (
                         chunk.byteLength,
                     ),
                 );
-            } else {
+            }
+            else {
                 controller.enqueue(new Uint8Array(chunk));
             }
         },
@@ -279,12 +282,15 @@ function bufferToStream(
     let pos = 0;
     return new ReadableStream({
         pull(controller) {
+
             if (pos === buf.byteLength) {
                controller.close();
                return;
             }
+
             const chunkSize =
                1 + (((0, Math.random)() * (buf.byteLength - pos)) | 0);
+
             controller.enqueue(buf.subarray(pos, pos + chunkSize));
             pos += chunkSize;
         },
