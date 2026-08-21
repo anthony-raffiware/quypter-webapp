@@ -11,7 +11,7 @@
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/mixins";
-@import "bootstrap/scss/maps"; 
+@import "bootstrap/scss/maps";
 //@use "bootstrap/scss/root";
 // Optional
 @import "bootstrap/scss/grid";
@@ -82,6 +82,10 @@ body {
   --primary-text-color: #e2e2e2;
   --primary-form-color: #343637;
   --active-nav-color: #3b4e66;
+}
+
+h1, h2, h3 {
+  line-height: 1.4; /* Adjusts space between lines within the header */
 }
 
 .bg_primary {

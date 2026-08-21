@@ -1,20 +1,20 @@
 <div class="row qc_header">
     <div class="col-6  px-0">
-      <h1 class="ps-3">QuickCrypt</h1> 
+      <h1 class="ps-3 my-0 py-4">QuickCrypt</h1>
     </div>
     <div class="col-6  px-0">
        <div class="d-flex flex-row justify-content-end align-items-center h-100">
             <div class="pe-3">
                <a  routerLink="/topic/new">
                  <button matButton="outlined">
-                    New Topic<mat-icon>add_circle</mat-icon> 
+                    New Topic<mat-icon>add_circle</mat-icon>
                  </button>
                </a>
             </div>
             <div class="bg_primary p-0 me-3" title="{{sessionKeyId()}}" style=" line-height: 0;">
-                <svg 
-                   data-jdenticon-value="{{sessionKeyId()}}" 
-                   width="50" 
+                <svg
+                   data-jdenticon-value="{{sessionKeyId()}}"
+                   width="50"
                    height="50"
                    role="img"
                    aria-labelledby="{{sessionKeyId()}}"
@@ -22,6 +22,6 @@
                    {{sessionKeyId()}}
                 </svg>
             </div>
-       </div> 
+       </div>
     </div>
 </div>
