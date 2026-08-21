@@ -119,32 +119,6 @@ export class SessionService {
     }
 
 
-    public async signRequest(
-        request: HttpRequest<unknown>
-    ): Promise<HttpRequest<unknown>> {
-
-        const privKeyEnc = this.sessionData.session_priv_key as string
-        const privKey    = await loadPrivateKey(privKeyEnc);
-
-        const uuid   = this.sessionData.id as string;
-        const nowUtc = getUtc()
-        const nonce  = genNonce()
-        const tokens = {
-            sessionUuid: uuid,
-            date: nowUtc,
-            nonce: nonce
-        }
-        const signature = await signTokens(tokens, privKey)
-
-        const newReq = request.clone({
-            //headers: req.headers.append('X-Authentication-Token', authToken),
-        });
-
-        console.log('In interceptor')
-
-        return newReq
-    }
-
     get sessionId() {
          return this.sessionData.id as string
     }

@@ -306,7 +306,7 @@ export class TopicService {
         const sharedSecret         = await deriveSecret( privateKey, topicPubKey );
         const topic_reply_priv_key = await exportKeyEncoded(privateKey);
         const topic_reply_pub_key  = await exportKeyEncoded(publicKey);
-        const path = sprintf('/topic/%s/send_reply', topic.id );
+        const path = sprintf('/topic/%s/send_reply/%s', topic.id, sessionId );
 
         newTopicReply.topic_reply_pub_key = topic_reply_pub_key
         //newTopicReply.topic_reply_pub_key_sig = 'PLACEHOLDER'

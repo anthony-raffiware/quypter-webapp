@@ -20,20 +20,15 @@ import {
     genNonce
 } from './utils';
 
-
-//import { SessionService } from './services/session';
-import { LocalStorageService } from './services/local-storage';
 import { SessionDataService, SessionData } from './services/session';
 
 
 export function requestSigningInterceptor(
     req: HttpRequest<unknown>,
     next: HttpHandlerFn
-): Observable<HttpEvent<any>> {
+): Observable<HttpEvent<unknown>> {
 
     const sessionData = inject(SessionDataService).loadLocalSessionData();
-
-    //return next(req)
 
     if (!sessionData?.id) {
         return next(req)
@@ -62,10 +57,12 @@ async function signRequest(
     const signature = await signTokens(tokens, privKey)
 
     const newRequest = request.clone({
-        //headers: req.headers.append('X-Authentication-Token', authToken),
-    });
+        headers: request.headers
+            .append('X-QCS-Signature', signature)
+            .append('X-QCS-TimeStamp', nowUtc)
+            .append('X-QCS-Nonce', nonce)
 
-    console.log('In Interceptor')
+    });
 
     return lastValueFrom(next(newRequest));
 }
