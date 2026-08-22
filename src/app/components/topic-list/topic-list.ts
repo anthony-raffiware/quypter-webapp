@@ -67,7 +67,7 @@ export class TopicList {
         return (base + randomBuf) * 1000
     }
 
-    checkTopicsUpdates() {
+    private checkTopicsUpdates() {
 
         this.topicService.needsTopicsUpdate()
             .subscribe({

@@ -212,6 +212,7 @@ export class TopicService {
         return resp
     }
 
+
     public async decryptTopic(
         topic: Topic,
     ): Promise<Topic> {
@@ -249,6 +250,7 @@ export class TopicService {
             )
     }
 
+
     public getTopicData(
         topicId: string,
     ): TopicStorageData | undefined {
@@ -258,12 +260,20 @@ export class TopicService {
         return topicsData[topicId]
     }
 
+
     public checkTopicUpdatedSinceLastLoad(
         topic: Topic,
     ): boolean {
 
         const topicId           = topic.id;
         const topicLastUpdateTs = topic.updated_ts
+        const topicCreatedTs    = topic.created_ts
+
+        // New Topic
+        if (topicCreatedTs == topicLastUpdateTs) {
+            return false
+        }
+
         const topicsData         = this.getTopicData(topicId)
         const topicLastLoadedTs  = topicsData?.last_loaded_ts
         const topicLastLoadedDt  = getUtcDt(topicLastLoadedTs)
@@ -289,6 +299,7 @@ export class TopicService {
         this.saveTopicsData(topicsData)
     }
 
+
     public updateTopicLastLoaded(
         topicId: string,
     ) {
@@ -306,11 +317,13 @@ export class TopicService {
         return this.storageService.getSerializedData('topic_data') as TopicsStorageData
     }
 
+
     private saveTopicsData(
         topicsData: TopicsStorageData
     ): void {
         this.storageService.saveSerializedData('topic_data', topicsData)
     }
+
 
     public fetchReplies(
         sessionId: string
@@ -320,6 +333,7 @@ export class TopicService {
 
         return this.apiService.getCollection(Topic,path)
     }
+
 
     public fetchTopicWithRecvReplies(
         sessionId: string ,
@@ -331,6 +345,7 @@ export class TopicService {
 
         return this.apiService.getObject(TopicWithReplies, path, options )
     }
+
 
     public async decryptRecvTopicReply(
         topicReply: TopicReply,
@@ -355,6 +370,7 @@ export class TopicService {
 
         return topicReply
     }
+
 
     public fetchTopicWithSentReplies(
         sessionId: string ,
@@ -418,6 +434,7 @@ export class TopicService {
             )
     }
 
+
     private addTopicReplyData(
         topicReplyId: string,
         topicReplyData: TopicReplySecretData
@@ -474,6 +491,7 @@ export class TopicService {
 
         return this.apiService.post<ReplyComment>(path, newReplyComment )
     }
+
 
     public needsTopicsUpdate(): Observable<boolean> {
 
