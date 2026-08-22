@@ -48,7 +48,6 @@ type LastTOpicUpdateDate = {
 }
 
 
-
 @Service()
 export class TopicService {
 
@@ -56,8 +55,11 @@ export class TopicService {
     private readonly storageService = inject(LocalStorageService);
     private readonly sessionService = inject(SessionService);
 
-    readonly decryptedTopics = signal<Array<Topic> | null>(null);
-    readonly topicMap        = signal<{ [name:string]: Topic}>({})
+    readonly decryptedTopics   = signal<Array<Topic> | null>(null);
+    readonly topicMap          = signal<{ [name:string]: Topic}>({})
+    readonly topicsWithUpdates = signal<string[]>([]);
+
+    isUpdatedTopic = (id: string) => () => this.topicsWithUpdates().includes(id);
 
     readonly topics = rxResource({
         stream: () => {
@@ -113,6 +115,14 @@ export class TopicService {
             if ( resp !== undefined ) {
 
                 const promises = resp.data.collection.map( async (topic) => {
+
+                    if (this.checkTopicUpdatedSinceLastLoad(topic)) {
+                        this.addToUpdatedTopics(topic.id)
+                    }
+                    else {
+                        this.removeFromUpdatedTopics(topic.id)
+                    }
+
                     return this.decryptTopic(topic)
                 })
 
@@ -130,6 +140,28 @@ export class TopicService {
 
         });
 
+    }
+
+
+    addToUpdatedTopics(id: string) {
+
+        this.topicsWithUpdates.update(ids =>
+
+            ids.includes(id)
+              ? ids
+              : [...ids, id]
+        );
+    }
+
+
+    removeFromUpdatedTopics(id: string) {
+
+        this.topicsWithUpdates.update(ids =>
+
+            ids.includes(id)
+              ? ids.filter(fid => fid !== id)
+              : ids
+        );
     }
 
 
@@ -226,6 +258,24 @@ export class TopicService {
         return topicsData[topicId]
     }
 
+    public checkTopicUpdatedSinceLastLoad(
+        topic: Topic,
+    ): boolean {
+
+        const topicId           = topic.id;
+        const topicLastUpdateTs = topic.updated_ts
+        const topicsData         = this.getTopicData(topicId)
+        const topicLastLoadedTs  = topicsData?.last_loaded_ts
+        const topicLastLoadedDt  = getUtcDt(topicLastLoadedTs)
+        const topicLastUpdatedDt = getUtcDt(topicLastUpdateTs)
+
+        if (topicLastUpdatedDt.isAfter(topicLastLoadedDt)) {
+            return true
+        }
+
+        return false
+    }
+
 
     private addTopicData(
         topicId: string,
@@ -247,6 +297,7 @@ export class TopicService {
 
         topicsData[topicId].last_loaded_ts = getUtc()
 
+        this.removeFromUpdatedTopics(topicId)
         this.saveTopicsData(topicsData)
     }
 
@@ -445,8 +496,6 @@ export class TopicService {
         if (!lastFetchTs) {
             return true
         }
-
-        console.log(lastFetchTs, lastUpdateTs)
 
         const lastFetch  = getUtcDt(lastFetchTs);
         const lastUpdate = getUtcDt(lastUpdateTs);

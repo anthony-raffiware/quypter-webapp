@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,7 @@ import { NgxJdenticonModule } from 'ngx-jdenticon';
 import { TopicService } from '../../shared/services/topic';
 import { environment } from '../../../environments/environment';
 import { AppErrorService } from '../../shared/services/app-error/app-error.service';
+import { Topic } from '../../shared/models/topic.model';
 
 @Component({
   selector: 'app-topic-list',
@@ -29,22 +30,25 @@ export class TopicList {
 
     private  intervalId: any;
 
+    readonly updatedTopics = computed(() => this.topicService.topicsWithUpdates() );
+
+
     constructor() {
         this.topicService.topics.reload()
     }
 
     ngOnInit() {
         this.intervalId = setInterval(() => {
-            this.checkTopicUpdates()
+            this.checkTopicsUpdates()
         }, environment.topicPollInt * 1000 );
     }
 
-    checkTopicUpdates() {
+    checkTopicsUpdates() {
 
         this.topicService.needsTopicsUpdate()
             .subscribe({
                 next: (needsUpdate) => {
-                    console.log(needsUpdate)
+                    //console.log(needsUpdate)
                     if (needsUpdate) {
                         this.topicService.topics.reload()
                     }
@@ -55,9 +59,11 @@ export class TopicList {
             })
     }
 
+
     ngOnDestroy() {
-      if (this.intervalId) {
-        clearInterval(this.intervalId);
-      }
+
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+        }
     }
 }
