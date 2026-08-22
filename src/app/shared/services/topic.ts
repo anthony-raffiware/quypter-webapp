@@ -182,10 +182,10 @@ export class TopicService {
 
     public async decryptTopic(
         topic: Topic,
-    ): Promise<Topic> { //Promise<void> {
+    ): Promise<Topic> {
 
         const topicData = this.getTopicData(topic.id)
-        const secret = topicData?.secretKey
+        const secret    = topicData?.secretKey
 
         await topic.decryptData(secret as string)
 

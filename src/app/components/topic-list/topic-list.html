@@ -1,7 +1,7 @@
-@if (topicService.decryptedTopics() === null) { 
-    Loading... 
+@if (topicService.decryptedTopics() === null) {
+    Loading...
 }
-@else  { 
+@else  {
 
 <mat-nav-list>
     @for (topic of topicService.decryptedTopics(); track topic.id) {
@@ -11,24 +11,29 @@
           [routerLink]="['/topic', topic.id  ]"
           routerLinkActive
           #rla="routerLinkActive"
-          [activated]="rla.isActive" 
+          [activated]="rla.isActive"
         >
 
-            <div 
+            <div
               class="d-flex flex-row justify-content-start align-items-center"
               title="{{topic.id}}"
             >
-                <svg 
-                   data-jdenticon-value="{{topic.id}}" 
-                   width="30" 
-                   height="30"
-                   role="img"
-                   aria-labelledby="{{topic.id}}"
-                >
-                   {{topic.id}}
-                </svg>
-                <div class="ps-2">
-                {{topic.decryptedData?.title }} 
+                <div class="d-flex flex-column justify-content-center">
+                    <svg
+                       data-jdenticon-value="{{topic.id}}"
+                       width="30"
+                       height="30"
+                       role="img"
+                       aria-labelledby="{{topic.id}}"
+                    >
+                       {{topic.id}}
+                    </svg>
+                </div>
+                <div class="d-flex flex-column justify-content-center topic-list-title">
+                {{topic.decryptedData?.title }}
+                </div>
+                <div class="d-flex flex-column justify-content-center ps-2">
+                   !!
                 </div>
             </div>
         </a>
