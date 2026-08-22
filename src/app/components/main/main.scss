@@ -2,6 +2,11 @@
    height: calc(100vh - 150px);
 }
 
+.select-list-container {
+   height: calc(100vh - 8em);
+   overflow: auto;
+}
+
 .qcs-nav-panel {
    display:block;
    height:inherit;
