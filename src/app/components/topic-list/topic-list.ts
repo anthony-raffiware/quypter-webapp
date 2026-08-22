@@ -38,9 +38,35 @@ export class TopicList {
     }
 
     ngOnInit() {
-        this.intervalId = setInterval(() => {
-            this.checkTopicsUpdates()
-        }, environment.topicPollInt * 1000 );
+
+        const pollSecs = this.getPollTimeMilSecs()
+        console.log(pollSecs)
+
+        this.intervalId =  setInterval(this.topicPoll.bind(this), pollSecs);
+    }
+
+    private topicPoll() {
+
+        const pollSecs = this.getPollTimeMilSecs()
+        console.log(pollSecs)
+
+        this.checkTopicsUpdates()
+        clearInterval(this.intervalId);
+
+        this.intervalId = setInterval(this.topicPoll.bind(this), pollSecs);
+
+    }
+
+    private getPollTimeMilSecs() {
+
+        const base = environment.topicPollInt;
+
+        // Thundering Herd mitigation
+        const min = 1;
+        const max = base/5;
+        const randomBuf = Math.floor(Math.random() * (max - min + 1)) + min;
+
+        return (base + randomBuf) * 1000
     }
 
     checkTopicsUpdates() {
