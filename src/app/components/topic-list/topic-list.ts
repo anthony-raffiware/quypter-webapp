@@ -48,7 +48,6 @@ export class TopicList {
     private topicPoll() {
 
         const pollSecs = this.getPollTimeMilSecs()
-        console.log(pollSecs)
 
         this.checkTopicsUpdates()
         clearInterval(this.intervalId);
