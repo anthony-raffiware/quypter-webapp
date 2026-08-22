@@ -40,7 +40,6 @@ export class TopicList {
     ngOnInit() {
 
         const pollSecs = this.getPollTimeMilSecs()
-        console.log(pollSecs)
 
         this.intervalId =  setInterval(this.topicPoll.bind(this), pollSecs);
     }
