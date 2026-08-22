@@ -2,7 +2,7 @@ import { Service, inject, signal, effect } from '@angular/core';
 import { HttpClientCommonOptions } from '@angular/common/http';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { sprintf } from 'sprintf-js';
-import { first, switchMap, Observable, tap, concatMap } from 'rxjs';
+import { first, of, switchMap, Observable, tap, concatMap } from 'rxjs';
 
 import { ApiService, QCApiResponse, QCApiCollectionObj } from './api';
 import { LocalStorageService } from './local-storage';
@@ -14,8 +14,9 @@ import {
     deriveSecret,
     exportKeyEncoded,
     generateAesKey,
+    getUtcDt,
     getUtc
-} from '../utils';
+ } from '../utils';
 import { Topic, NewTopic, TopicWithReplies } from '../models/topic.model';
 import { TopicReply, NewTopicReply } from '../models/topic-reply.model';
 import { SessionService } from './session';
@@ -41,6 +42,11 @@ export type TopicReplySecretData = {
 export type TopicRepliesSecretData = {
   [name: string ]: TopicReplySecretData
 }
+
+type LastTOpicUpdateDate = {
+    last_topic_update_ts: string
+}
+
 
 
 @Service()
@@ -112,7 +118,7 @@ export class TopicService {
 
                 Promise.all(promises).then((decrypted) => {
 
-                    this.setLastTopicFetchTs()
+                    this.setLastTopicsFetchTs()
                     const topicMap: { [name:string]: Topic } = {}
 
                     decrypted.map((topic) => { topicMap[topic.id] = topic } )
@@ -194,6 +200,21 @@ export class TopicService {
        const path = sprintf('/session/%s/topics', sessionId )
 
        return this.apiService.getCollection(Topic,path)
+    }
+
+
+    public fetchLastTopicsUpdate(): Observable<QCApiResponse<LastTOpicUpdateDate>> {
+
+        return this.sessionService.isSessionLoaded()
+            .pipe(
+                concatMap( (loaded) => {
+
+                   const sessionId = this.sessionService.sessionId as string
+                   const path = sprintf('/session/%s/topics/last_update', sessionId)
+
+                   return this.apiService.get<LastTOpicUpdateDate>(path)
+                })
+            )
     }
 
     public getTopicData(
@@ -403,14 +424,47 @@ export class TopicService {
         return this.apiService.post<ReplyComment>(path, newReplyComment )
     }
 
+    public needsTopicsUpdate(): Observable<boolean> {
 
-    private getLastTopicFetchTs(
-        topicsData: TopicsStorageData
-    ): void {
-        this.storageService.getData('last_topic_fetch_ts')
+        return this.fetchLastTopicsUpdate()
+            .pipe(
+                switchMap((replyResp) => {
+
+                    const lastUpdateTs = replyResp.data.last_topic_update_ts
+
+                    return of(this.checkLastTopicsUpdate(lastUpdateTs))
+                })
+            )
     }
 
-    private setLastTopicFetchTs(): void {
+
+    private checkLastTopicsUpdate(lastUpdateTs: string) {
+
+        const lastFetchTs = this.getLastTopicsFetchTs() as string
+
+        if (!lastFetchTs) {
+            return true
+        }
+
+        console.log(lastFetchTs, lastUpdateTs)
+
+        const lastFetch  = getUtcDt(lastFetchTs);
+        const lastUpdate = getUtcDt(lastUpdateTs);
+
+        if (lastUpdate.isAfter(lastFetch)) {
+            return true
+        }
+
+        return false
+    }
+
+
+    private getLastTopicsFetchTs(): string | null {
+        return this.storageService.getData('last_topic_fetch_ts')
+    }
+
+
+    private setLastTopicsFetchTs(): void {
         this.storageService.saveData('last_topic_fetch_ts', getUtc())
     }
 }
