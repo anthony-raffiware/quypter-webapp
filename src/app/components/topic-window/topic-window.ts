@@ -17,6 +17,7 @@ import { of, catchError, Observable, throwError } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { sprintf } from 'sprintf-js';
 
@@ -35,7 +36,8 @@ import { AppErrorService } from '../../shared/services/app-error/app-error.servi
       MatInputModule,
       MatIconModule,
       MatButtonModule,
-      TopicReplyList
+      TopicReplyList,
+      MatTooltipModule
   ],
   templateUrl: './topic-window.html',
   styleUrl: './topic-window.scss',
