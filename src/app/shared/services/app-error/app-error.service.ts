@@ -1,6 +1,6 @@
 import { Service, inject, signal, effect } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { QCApiResponse } from '../api';
+import { QCApiResponse, QCApiErrorData } from '../api';
 
 
 export type QCAppError = {
@@ -37,11 +37,13 @@ export class AppErrorService {
         } else {
             console.error('server', error);
 
-            const apiError = error.error as QCApiResponse<string>;
+            const apiError = error.error as QCApiResponse<QCApiErrorData>;
+
+            const msg = Array.isArray(apiError.data) ? apiError.data[0].msg : apiError.data
 
             const appError: QCAppError = {
                 code: error.status,
-                msg: apiError.data,
+                msg: msg,
                 requestId: apiError.meta.request_id,
                 header: 'API Error'
             }

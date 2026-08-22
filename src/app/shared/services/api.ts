@@ -40,6 +40,16 @@ type QCApiResponseMeta = {
     request_id: string
 }
 
+type QCApiValidationErrorData =  {
+   loc: {
+     path: string
+   }
+   msg: string,
+   type: string
+}
+
+export type QCApiErrorData = Array<QCApiValidationErrorData> | string
+
 export type QCApiResponse<T=any> = {
     data: T,
     meta: QCApiResponseMeta
