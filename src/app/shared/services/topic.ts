@@ -13,7 +13,8 @@ import {
     createX25519Keys,
     deriveSecret,
     exportKeyEncoded,
-    generateAesKey
+    generateAesKey,
+    getUtc
 } from '../utils';
 import { Topic, NewTopic, TopicWithReplies } from '../models/topic.model';
 import { TopicReply, NewTopicReply } from '../models/topic-reply.model';
@@ -24,6 +25,7 @@ import { ReplyComment, NewReplyComment } from '../models/reply-comment.model';
 export type TopicStorageData = {
     privKey: string,
     secretKey: string
+    last_loaded_ts: string
 }
 
 export type TopicsStorageData = {
@@ -110,6 +112,7 @@ export class TopicService {
 
                 Promise.all(promises).then((decrypted) => {
 
+                    this.setLastTopicFetchTs()
                     const topicMap: { [name:string]: Topic } = {}
 
                     decrypted.map((topic) => { topicMap[topic.id] = topic } )
@@ -146,7 +149,8 @@ export class TopicService {
 
                     const topicData: TopicStorageData = {
                        privKey: topicPrivKey,
-                       secretKey: aesSecret
+                       secretKey: aesSecret,
+                       last_loaded_ts: getUtc()
                     }
 
                     this.topics.reload()
@@ -213,6 +217,18 @@ export class TopicService {
 
         this.saveTopicsData(topicsData)
     }
+
+    public updateTopicLastLoaded(
+        topicId: string,
+    ) {
+
+        let topicsData = this.loadTopicsData()
+
+        topicsData[topicId].last_loaded_ts = getUtc()
+
+        this.saveTopicsData(topicsData)
+    }
+
 
     private loadTopicsData(): TopicsStorageData {
         return this.storageService.getSerializedData('topic_data') as TopicsStorageData
@@ -387,4 +403,14 @@ export class TopicService {
         return this.apiService.post<ReplyComment>(path, newReplyComment )
     }
 
+
+    private getLastTopicFetchTs(
+        topicsData: TopicsStorageData
+    ): void {
+        this.storageService.getData('last_topic_fetch_ts')
+    }
+
+    private setLastTopicFetchTs(): void {
+        this.storageService.saveData('last_topic_fetch_ts', getUtc())
+    }
 }

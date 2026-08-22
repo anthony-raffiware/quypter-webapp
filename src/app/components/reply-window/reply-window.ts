@@ -60,7 +60,7 @@ export class ReplyWindow {
     private readonly dialog          = inject(MatDialog);
     private readonly appErrorService = inject(AppErrorService);
 
-    readonly topicUuid       = input.required<string>();
+    readonly topicUuid = input.required<string>();
 
     readonly topic            = signal<TopicWithReplies|null>(null);
     readonly decryptedReplies = signal<Array<TopicReply>>([]);
@@ -251,8 +251,6 @@ export class ReplyWindow {
 
         const newTopicReply = new NewTopicReply();
         newTopicReply.data = replyData;
-
-        console.log('reply', this.sessionService.sessionLoaded$.value)
 
         this.sessionService.isSessionLoaded()
             .pipe(

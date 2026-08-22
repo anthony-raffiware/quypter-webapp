@@ -562,15 +562,32 @@ export function validDate(
  *·
  * @returns {string}  ISO8601 datetime stamp with UTC offset
  */
+export function getUtcDt(
+    dateStr?: string
+) {
+
+    if ( dateStr !== undefined ) {
+        return dayjs(dateStr).utc();
+    }
+
+    return dayjs().utc();
+}
+
+
+/**
+ * @param {string} [dateStr]  datetime stamp
+ *·
+ * @returns {string}  ISO8601 datetime stamp with UTC offset
+ */
 export function getUtc(
     dateStr?: string
 ) {
 
     if ( dateStr !== undefined ) {
-        return dayjs(dateStr).utc().format('YYYY-MM-DD HH:mm:ss Z');
+        return getUtcDt().format('YYYY-MM-DD HH:mm:ss Z');
     }
 
-    return dayjs().utc().format('YYYY-MM-DD HH:mm:ss Z');
+    return  getUtcDt().format('YYYY-MM-DD HH:mm:ss Z');
 }
 
 

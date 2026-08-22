@@ -100,6 +100,7 @@ export class TopicWindow {
                 )
                 .pipe(
                     catchError( (error: HttpErrorResponse): Observable<any> => {
+
                         this.appErrorService.setApiError(error)
 
                         return throwError( () => error )
@@ -141,6 +142,10 @@ export class TopicWindow {
             const topicReplies = this.topicResource.value()?.data.replies as Array<TopicReply>;
 
             if ( topicReplies !== undefined && this.loadingReplies() ) {
+
+                const topicId = this.topicResource.value()?.data.id
+
+                this.topicService.updateTopicLastLoaded(topicId)
 
                 if ( topicReplies.length < this.replyLimit() ) {
                     this.loadingReplies.set(false)
