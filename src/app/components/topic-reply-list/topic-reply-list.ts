@@ -167,7 +167,6 @@ export class TopicReplyList {
         this.sessionService.isSessionLoaded()
             .pipe(
                 switchMap( (loaded) => {
-                    console.log(loaded)
 
                     return from(this.topicService.createReplyComment(newComment))
                         .pipe( switchMap( (s) => { return s }))
@@ -175,7 +174,7 @@ export class TopicReplyList {
             )
             .subscribe({
                 next: (commentResp) => {
-                    console.log(commentResp)
+
                     this.cf.markAsUntouched();
                     this.cf.setErrors(null);
                     this.cf.reset();

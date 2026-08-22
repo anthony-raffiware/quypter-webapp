@@ -72,7 +72,7 @@ export class TopicList {
         this.topicService.needsTopicsUpdate()
             .subscribe({
                 next: (needsUpdate) => {
-                    //console.log(needsUpdate)
+
                     if (needsUpdate) {
                         this.topicService.topics.reload()
                     }
