@@ -2,16 +2,6 @@
   height: 100%;
 }
 
-.topic-form {
-  min-width: 150px;
-  max-width: 500px;
-  width: 100%;
-}
-
-.topic-full-width {
-  width: 100%;
-}
-
-.reply-link {
-    min-width: 0px;
+.reply-list-container {
+    height: calc(100vh - 290px);
 }

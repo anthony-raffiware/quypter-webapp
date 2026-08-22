@@ -53,6 +53,7 @@ export class AppError {
 @Component({
   selector: 'app-app-error-dialog',
   templateUrl: 'app-app-error-dialog.html',
+  styleUrl: './app-error.scss',
   imports: [
     MatDialogTitle,
     MatDialogContent,

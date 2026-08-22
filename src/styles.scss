@@ -125,6 +125,10 @@ $main-height-offset: $header-height; //15 ; // $footer-height;
   }
 }
 
+.lh-zero {
+  line-height: 0;
+}
+
 .qc_header {
   background: var(--active-nav-color);
   margin-left: 0px;

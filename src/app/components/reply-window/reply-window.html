@@ -1,50 +1,50 @@
 <div class="row d-flex flex-fill  px-3 mx-0 h-100">
-  <div class="col-12 d-flex flex-column  pt-4 px-0 " style="height: calc(100vh - 125px);">
-    <div class="row mx-0 w-100">
-      <div class="col d-flex  justify-content-center">
-         <form class="message-reply-form" [formGroup]="messageReplyForm" (ngSubmit)="onMessageSubmit()">
-           <div class="row mx-0">
-               <mat-form-field class="topic-full-width px-0">
-                  <mat-label>Message Content</mat-label>
-                  <textarea
-                     matInput
-                     placeholder="Ex. Some text to be encrypted"
-                     rows="4"
-                     formControlName="messageData"
-                     [errorStateMatcher]="matcher"
-                  >
+    <div class="col-12 d-flex flex-column reply-window-container pt-4 px-0 ">
+        <div class="row mx-0 w-100">
+          <div class="col d-flex  justify-content-center">
+             <form class="message-reply-form" [formGroup]="messageReplyForm" (ngSubmit)="onMessageSubmit()">
+               <div class="row mx-0">
+                   <mat-form-field class="topic-full-width px-0">
+                      <mat-label>Message Content</mat-label>
+                      <textarea
+                         matInput
+                         placeholder="Ex. Some text to be encrypted"
+                         rows="4"
+                         formControlName="messageData"
+                         [errorStateMatcher]="matcher"
+                      >
 
-                  </textarea>
-               </mat-form-field>
-           </div>
-           <div class="row">
-               <div class="col d-flex flex-fill justify-content-center">
-                 <button
-                    matButton="outlined"
-                    type="submit"
-                    [disabled]="messageReplyForm.invalid"
-                 >
-                    Send
-                 </button>
+                      </textarea>
+                   </mat-form-field>
+               </div>
+               <div class="row">
+                   <div class="col d-flex flex-fill justify-content-center">
+                     <button
+                        matButton="outlined"
+                        type="submit"
+                        [disabled]="messageReplyForm.invalid"
+                     >
+                        Send
+                     </button>
 
-                 <button matButton="elevated" (click)="openAddImageDialog($event)">Image</button>
-              </div>
+                     <button matButton="elevated" (click)="openAddImageDialog($event)">Image</button>
+                  </div>
+               </div>
+             </form>
+         </div>
+        </div>
+        <div class="row flex-grow-1 mx-0 mt-4 overflow-auto ">
+            <!---->
+           <div class="col-12  d-flex flex-column h-100 px-0">
+                <app-topic-reply-list
+                   [decryptedReplies]="decryptedReplies()"
+                   [loadingReplies]="loadingReplies()"
+                   [showIdenticon]="false"
+                   (endOfScrollOut)="handleEndOfScroll($event)"
+                >
+                </app-topic-reply-list>
            </div>
-         </form>
-     </div>
+        </div>
     </div>
-    <div class="row flex-grow-1 mx-0 mt-4" style="overflow-y: auto">
-        <!---->
-       <div class="col-12  d-flex flex-column h-100 px-0">
-            <app-topic-reply-list
-               [decryptedReplies]="decryptedReplies()"
-               [loadingReplies]="loadingReplies()"
-               [showIdenticon]="false"
-               (endOfScrollOut)="handleEndOfScroll($event)"
-            >
-            </app-topic-reply-list>
-       </div>
-    </div>
-  </div>
 </div>
 
