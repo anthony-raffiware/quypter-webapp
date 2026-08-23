@@ -1,5 +1,7 @@
 # Quypter Webapp
 
+Simple web based end-to-end encrypted message feed
+
 ## Run Self Hosted
 
 Start the API
