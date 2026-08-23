@@ -53,6 +53,8 @@ export class TopicWindow {
 
     readonly topicUuid = input.required<string>();
 
+    readonly topicListPos = signal<number|null>(null)
+
     readonly topic            = signal<Topic|null>(null);
     readonly replyUrl         = signal<string|null>(null);
     readonly decryptedReplies = signal<Array<TopicReply>>([]);
@@ -62,7 +64,9 @@ export class TopicWindow {
     private readonly replyLastId = signal<string|null>(null);
     private readonly replyLastTs = signal<string|null>(null);
 
-    readonly sessionId = computed(() => this.sessionService.session().id );
+    readonly sessionId     = computed(() => this.sessionService.session().id );
+    readonly updatedTopics = computed(() => this.topicService.topicsWithUpdates() );
+
 
     private urlBase!: string;
     private urlCopied: boolean = false;
@@ -128,10 +132,8 @@ export class TopicWindow {
             if ( topic !== undefined ) {
 
                 if ( this.topic() && ( this.topicUuid() != this.topic()?.id ) ) {
-                    this.decryptedReplies.set([])
-                    this.replyLimit.set(5)
-                    this.replyLastId.set(null)
-                    this.replyLastTs.set(null)
+
+                    this.clearCursorResults()
                 }
 
                 this.topic.set(topic)
@@ -146,8 +148,6 @@ export class TopicWindow {
             if ( topicReplies !== undefined && this.loadingReplies() ) {
 
                 const topicId = this.topicResource.value()?.data.id
-
-                this.topicService.updateTopicLastLoaded(topicId)
 
                 if ( topicReplies.length < this.replyLimit() ) {
                     this.loadingReplies.set(false)
@@ -166,6 +166,28 @@ export class TopicWindow {
             }
 
         })
+
+
+        effect( () => {
+
+            if ( this.topic() == null ) {
+                return
+            }
+
+            if ( this.topicListPos() == 0 ){
+
+                const topicId = this.topic()?.id as string
+
+                if ( topicId && this.updatedTopics().includes(topicId) ) {
+
+                    this.clearCursorResults()
+                    this.topicResource.reload()
+                }
+
+                this.topicService.updateTopicLastLoaded(topicId)
+            }
+        })
+
     }
 
 
@@ -180,6 +202,19 @@ export class TopicWindow {
             this.replyLastId.set(last.id)
             this.replyLastTs.set(last.created_ts)
         }
+    }
+
+    handleTopOfScroll(
+        event: Event
+    ): void {
+
+        const topicId = this.topic()?.id as string
+
+        if ( topicId && this.updatedTopics().includes(topicId) ) {
+            this.clearCursorResults()
+            this.topicResource.reload()
+        }
+
     }
 
     copyText() {
@@ -199,6 +234,13 @@ export class TopicWindow {
             }
 
         }
+    }
+
+    private clearCursorResults() {
+        this.decryptedReplies.set([])
+        this.replyLimit.set(5)
+        this.replyLastId.set(null)
+        this.replyLastTs.set(null)
     }
 
 }

@@ -44,27 +44,17 @@
                 </div>
             </div>
             <div class="row flex-grow-1 mx-0 my-0 mt-4 w-100">
-               <div class="col-12 d-flex flex-column px-0 pb-5 reply-list-container">
-
-             <!--
-               <div class="col-12 col-lg-10 d-flex flex-column px-0">
-
-              -->
-
-                   <!--
-                   @if ( decryptedReplies() !== null) {
-                    -->
-                   <app-topic-reply-list
-                       [(decryptedReplies)]="decryptedReplies"
-                       [loadingReplies]="loadingReplies()"
-                       [commentAction]="true"
-                       (endOfScrollOut)="handleEndOfScroll($event)"
-                    >
-                    </app-topic-reply-list>
-                    <!--
-                   }
-                     -->
-               </div>
+                <div class="col-12 d-flex flex-column px-0 pb-5 reply-list-container">
+                    <app-topic-reply-list
+                        [(decryptedReplies)]="decryptedReplies"
+                        [(scrollPosOut)]="topicListPos"
+                        [loadingReplies]="loadingReplies()"
+                        [commentAction]="true"
+                        (endOfScrollOut)="handleEndOfScroll($event)"
+                        (topOfScrollOut)="handleTopOfScroll($event)"
+                     >
+                     </app-topic-reply-list>
+                </div>
             </div>
          </div>
        </div>

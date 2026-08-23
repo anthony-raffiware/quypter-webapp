@@ -71,13 +71,22 @@ export class TopicReplyList {
     readonly showIdenticon    = input<boolean>(true);
     readonly commentAction    = input<boolean>(false);
 
+    readonly topOfScrollOut = output<Event>();
     readonly endOfScrollOut = output<Event>();
+    readonly scrollPosOut   = model<number|null>();
 
     readonly sessionId     = computed(() => this.sessionService.session().id );
     readonly addingComment = signal<string|null>(null)
 
+    private readonly scrollPos   = signal<number|null>(null)
+    private readonly debouncedScrollPos = debounced(() => this.scrollPos(), 500);
+
     private readonly endOfScroll   = signal<Event|null>(null)
     private readonly debouncedEndOfScroll = debounced(() => this.endOfScroll(), 500);
+
+    private readonly topOfScroll   = signal<Event|null>(null)
+    private readonly debouncedTopOfScroll = debounced(() => this.topOfScroll(), 500);
+
 
     readonly matcher = new QCErrorStateMatcher();
     readonly commentForm!: FormGroup;
@@ -89,11 +98,32 @@ export class TopicReplyList {
             comment: ['', [Validators.required ] ],
         });
 
-        effect( () => {
-            const scrollEvent = this.debouncedEndOfScroll.value();
+        this.scrollPos.set(0)
 
-            if (scrollEvent !== null ) {
-                this.endOfScrollOut.emit(scrollEvent)
+        effect( () => {
+
+            const scrollPos      = this.debouncedScrollPos.value();
+
+            if (scrollPos !== null ) {
+                this.scrollPosOut.set(scrollPos)
+            }
+        })
+        effect( () => {
+
+            const endScrollEvent = this.debouncedEndOfScroll.value();
+
+            if (endScrollEvent !== null ) {
+                this.endOfScrollOut.emit(endScrollEvent)
+            }
+        })
+
+
+        effect( () => {
+
+            const topScrollEvent = this.debouncedTopOfScroll.value();
+
+            if (topScrollEvent !== null ) {
+                this.topOfScrollOut.emit(topScrollEvent)
             }
         })
 
@@ -122,11 +152,17 @@ export class TopicReplyList {
 
         const element = event.target;
 
+        this.scrollPos.set(element.scrollTop)
+
         if ( (element.scrollTop > 0 )
           && (element.offsetHeight + element.scrollTop >= element.scrollHeight)
         ) {
             this.endOfScroll.set(event)
-      }
+        }
+
+        if ( element.scrollTop == 0 ) {
+            this.topOfScroll.set(event)
+        }
     }
 
     addComment(
