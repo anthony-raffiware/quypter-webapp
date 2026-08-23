@@ -12,7 +12,7 @@ import { HttpErrorResponse, } from '@angular/common/http';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Clipboard } from '@angular/cdk/clipboard';
 
-import { of, catchError, Observable, throwError } from 'rxjs';
+import { of, catchError, tap,  Observable, throwError } from 'rxjs';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -50,7 +50,6 @@ export class TopicWindow {
     private readonly document         = inject(DOCUMENT);
     private readonly appErrorService  = inject(AppErrorService);
 
-
     readonly topicUuid = input.required<string>();
 
     readonly topicListPos     = signal<number|null>(null)
@@ -65,7 +64,6 @@ export class TopicWindow {
 
     readonly sessionId     = computed(() => this.sessionService.session().id );
     readonly updatedTopics = computed(() => this.topicService.topicsWithUpdates() );
-
 
     private urlBase!: string;
     private urlCopied: boolean = false;
@@ -107,9 +105,13 @@ export class TopicWindow {
                     catchError( (error: HttpErrorResponse): Observable<any> => {
 
                         this.appErrorService.setApiError(error)
+                        this.loadingReplies.set(false)
 
                         return throwError( () => error )
 
+                    }),
+                    tap ( () => {
+                        this.loadingReplies.set(false)
                     })
                 )
 
@@ -145,13 +147,7 @@ export class TopicWindow {
 
             const topicReplies = this.topicResource.value()?.data.replies as Array<TopicReply>;
 
-            if ( topicReplies !== undefined && this.loadingReplies() ) {
-
-                const topicId = this.topicResource.value()?.data.id
-
-                if ( topicReplies.length < this.replyLimit() ) {
-                    this.loadingReplies.set(false)
-                }
+            if ( topicReplies !== undefined ) {
 
                 const promises = topicReplies.map( async (topicReply) => {
                     return this.topicService.decryptRecvTopicReply(topicReply)
@@ -182,9 +178,9 @@ export class TopicWindow {
 
                     this.clearCursorResults()
                     this.topicResource.reload()
+                    this.topicService.updateTopicLastLoaded(topicId)
                 }
 
-                this.topicService.updateTopicLastLoaded(topicId)
             }
         })
 
