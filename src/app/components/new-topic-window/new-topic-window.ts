@@ -60,12 +60,11 @@ export class NewTopicWindow {
     private readonly router          = inject(Router);
     private readonly route           = inject(ActivatedRoute);
 
-
     constructor() {
 
         this.topicForm = new FormBuilder().group({
             subject:     ['', [Validators.required ] ],
-            description: ['', [Validators.required ] ],
+            description: ['', [] ],
         });
 
     }

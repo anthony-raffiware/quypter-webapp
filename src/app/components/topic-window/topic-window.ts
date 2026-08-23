@@ -53,8 +53,7 @@ export class TopicWindow {
 
     readonly topicUuid = input.required<string>();
 
-    readonly topicListPos = signal<number|null>(null)
-
+    readonly topicListPos     = signal<number|null>(null)
     readonly topic            = signal<Topic|null>(null);
     readonly replyUrl         = signal<string|null>(null);
     readonly decryptedReplies = signal<Array<TopicReply>>([]);
@@ -117,6 +116,7 @@ export class TopicWindow {
         }
     });
 
+
     constructor() {
 
         const proto = this.document.location.protocol;
@@ -174,7 +174,7 @@ export class TopicWindow {
                 return
             }
 
-            if ( this.topicListPos() == 0 ){
+            if ( this.topicListPos() == 0 ) {
 
                 const topicId = this.topic()?.id as string
 
@@ -204,6 +204,7 @@ export class TopicWindow {
         }
     }
 
+
     handleTopOfScroll(
         event: Event
     ): void {
@@ -216,6 +217,7 @@ export class TopicWindow {
         }
 
     }
+
 
     copyText() {
         // sloppy debounce
@@ -235,6 +237,7 @@ export class TopicWindow {
 
         }
     }
+
 
     private clearCursorResults() {
         this.decryptedReplies.set([])

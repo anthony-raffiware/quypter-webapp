@@ -63,7 +63,6 @@ export class TopicReplyList {
     private readonly topicService    = inject(TopicService);
     private readonly appErrorService = inject(AppErrorService);
 
-
     @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
     readonly decryptedReplies = model.required<Array<TopicReply>>();
@@ -78,15 +77,12 @@ export class TopicReplyList {
     readonly sessionId     = computed(() => this.sessionService.session().id );
     readonly addingComment = signal<string|null>(null)
 
-    private readonly scrollPos   = signal<number|null>(null)
-    private readonly debouncedScrollPos = debounced(() => this.scrollPos(), 500);
-
-    private readonly endOfScroll   = signal<Event|null>(null)
+    private readonly scrollPos            = signal<number|null>(null)
+    private readonly debouncedScrollPos   = debounced(() => this.scrollPos(), 500);
+    private readonly endOfScroll          = signal<Event|null>(null)
     private readonly debouncedEndOfScroll = debounced(() => this.endOfScroll(), 500);
-
-    private readonly topOfScroll   = signal<Event|null>(null)
+    private readonly topOfScroll          = signal<Event|null>(null)
     private readonly debouncedTopOfScroll = debounced(() => this.topOfScroll(), 500);
-
 
     readonly matcher = new QCErrorStateMatcher();
     readonly commentForm!: FormGroup;
@@ -102,12 +98,13 @@ export class TopicReplyList {
 
         effect( () => {
 
-            const scrollPos      = this.debouncedScrollPos.value();
+            const scrollPos = this.debouncedScrollPos.value();
 
             if (scrollPos !== null ) {
                 this.scrollPosOut.set(scrollPos)
             }
         })
+
         effect( () => {
 
             const endScrollEvent = this.debouncedEndOfScroll.value();
@@ -116,7 +113,6 @@ export class TopicReplyList {
                 this.endOfScrollOut.emit(endScrollEvent)
             }
         })
-
 
         effect( () => {
 
@@ -224,7 +220,7 @@ export class TopicReplyList {
 
                     this.decryptedReplies.update(replies =>
                         replies.map(curReply =>
-                          curReply.id === reply.id ? reply : curReply
+                            curReply.id === reply.id ? reply : curReply
                         )
                     );
 

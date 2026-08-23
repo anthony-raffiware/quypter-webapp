@@ -18,6 +18,7 @@ import { environment } from '../../../environments/environment';
 export class Main {
 
     readonly topicService = inject(TopicService);
+
     private readonly appErrorService = inject(AppErrorService);
 
     private  intervalId: any;
@@ -27,7 +28,7 @@ export class Main {
 
         const pollSecs = this.getPollTimeMilSecs()
 
-        this.intervalId =  setInterval(this.topicPoll.bind(this), pollSecs);
+        this.intervalId = setInterval(this.topicPoll.bind(this), pollSecs);
     }
 
     private topicPoll() {
@@ -45,9 +46,9 @@ export class Main {
 
         const base = environment.topicPollInt;
 
-        // Thundering Herd mitigation
+        // Thundering Herd mitigation.
         const min = 1;
-        const max = base/5;
+        const max = base/3;
         const randomBuf = Math.floor(Math.random() * (max - min + 1)) + min;
 
         return (base + randomBuf) * 1000

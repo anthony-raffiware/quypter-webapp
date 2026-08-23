@@ -13,12 +13,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {
-  MAT_DIALOG_DATA,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogRef,
-  MatDialogTitle,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogContent,
+    MatDialogRef,
+    MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -60,7 +59,6 @@ export class AddReplyImage {
     @ViewChild('canvasContainer') canvas!: ElementRef<HTMLCanvasElement>;
 
     private readonly dialogRef    = inject(MatDialogRef<AddReplyImage>);
-    private readonly domSanitizer = inject(DomSanitizer);
 
     readonly imageData     = signal<string>('');
     readonly thumbData     = signal<string>('');

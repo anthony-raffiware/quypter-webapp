@@ -8,7 +8,7 @@
             matInput
             formControlName="subject"
             [errorStateMatcher]="matcher"
-            placeholder="Ex. My secret messages"
+            placeholder="Ex. My Secret Topic"
         >
         @if (topicForm.get('subject')?.hasError('required')) {
           <mat-error>Topic is <strong>required</strong></mat-error>
@@ -19,7 +19,7 @@
          <mat-label>Description</mat-label>
          <textarea
             matInput
-            placeholder="Ex. Heres some notes about this"
+            placeholder="Ex. Heres some info about this topic"
             rows="8"
             formControlName="description"
             [errorStateMatcher]="matcher"
