@@ -64,6 +64,16 @@ export class TopicWindow {
 
     readonly sessionId     = computed(() => this.sessionService.session().id );
     readonly updatedTopics = computed(() => this.topicService.topicsWithUpdates() );
+    readonly hasNewReplies = computed(() => {
+
+        const topicId = this.topic()?.id as string
+
+        if (!topicId) {
+            return false
+        }
+
+        return this.topicService.topicsWithUpdates().includes(topicId)
+    });
 
     private urlBase!: string;
     private urlCopied: boolean = false;
@@ -172,9 +182,9 @@ export class TopicWindow {
 
             if ( this.topicListPos() == 0 ) {
 
-                const topicId = this.topic()?.id as string
+                if ( this.hasNewReplies() ) {
 
-                if ( topicId && this.updatedTopics().includes(topicId) ) {
+                    const topicId = this.topic()?.id as string
 
                     this.clearCursorResults()
                     this.topicResource.reload()
@@ -205,9 +215,8 @@ export class TopicWindow {
         event: Event
     ): void {
 
-        const topicId = this.topic()?.id as string
+        if ( this.hasNewReplies() ) {
 
-        if ( topicId && this.updatedTopics().includes(topicId) ) {
             this.clearCursorResults()
             this.topicResource.reload()
         }
