@@ -4,7 +4,7 @@ declare const base: string;
 export const environment = {
   production: true,
   maxImageSize: 5000000,
-  topicPollInt: 20,
+  topicPollInt: 15,
   apiUrl,
   base
 };
