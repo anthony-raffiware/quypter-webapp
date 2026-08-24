@@ -118,16 +118,16 @@ export class AddReplyImage {
 
             const file = files[0];
 
-            if ( file.size > environment.maxImageSize ) {
-
-                this.imageError.set('Image To Large')
+            if ( !validateImageType(file) ) {
+                this.imageError.set('Invalid Image')
                 this.loadingImage.set(false)
 
                 return
             }
 
-            if ( !validateImageType(file) ) {
-                this.imageError.set('Invalid Image')
+            if ( file.size > environment.maxImageSize ) {
+
+                this.imageError.set('Image To Large')
                 this.loadingImage.set(false)
 
                 return
