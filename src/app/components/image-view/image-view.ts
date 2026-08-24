@@ -1,22 +1,24 @@
-import { 
-    Component, 
-    inject, 
-    signal, 
+import {
+    Component,
+    inject,
+    signal,
     computed ,
 } from '@angular/core';
-
 import {FormsModule} from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
+
 import {MatButtonModule} from '@angular/material/button';
 import {
-  MAT_DIALOG_DATA,
-  MatDialogContent,
-  MatDialogRef,
+    MAT_DIALOG_DATA,
+    MatDialogContent,
+    MatDialogRef,
 } from '@angular/material/dialog';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { DomSanitizer } from '@angular/platform-browser';
+
+import { safeImagePipe } from '../../shared/utils';
 
 export interface ImageDialogData {
   imageData: string;
@@ -32,20 +34,22 @@ export interface ImageDialogData {
     MatDialogContent,
     MatIconModule,
     MatButtonToggleModule,
+    safeImagePipe
   ],
   templateUrl: './image-view.html',
   styleUrl: './image-view.scss',
 })
 export class ImageView {
 
-    readonly dialogRef    = inject(MatDialogRef<ImageView>);
-    readonly data         = inject<ImageDialogData>(MAT_DIALOG_DATA);
-    readonly domSanitizer = inject(DomSanitizer);
+    private readonly dialogRef    = inject(MatDialogRef<ImageView>);
+    private readonly data         = inject<ImageDialogData>(MAT_DIALOG_DATA);
+    private readonly domSanitizer = inject(DomSanitizer);
 
     readonly imageData    = signal<string>(this.data.imageData);
+    readonly imageData2   = signal<string>(this.data.imageData);
 
-    public safeImageData = computed(() => 
-        this.domSanitizer.bypassSecurityTrustResourceUrl(this.imageData())
+    public safeImageData = computed(() =>
+        this.domSanitizer.bypassSecurityTrustUrl(this.imageData())
     );
 
 }

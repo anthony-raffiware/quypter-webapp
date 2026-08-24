@@ -1,6 +1,23 @@
 import { Service, inject  } from '@angular/core';
-import { HttpClient,  HttpClientCommonOptions, HttpErrorResponse } from '@angular/common/http';
-import { Observable, tap, catchError, throwError, first, switchMap, of } from 'rxjs';
+import {
+    HttpClient,
+    HttpClientCommonOptions,
+    HttpErrorResponse,
+    HttpRequest,
+    HttpHandlerFn,
+    HttpEvent
+} from '@angular/common/http';
+import {
+    Observable,
+    tap,
+    catchError,
+    throwError,
+    first,
+    switchMap,
+    of,
+    from,
+    lastValueFrom
+} from 'rxjs';
 import { sprintf } from 'sprintf-js';
 import { environment } from '../../../environments/environment';
 
@@ -23,8 +40,18 @@ type QCApiResponseMeta = {
     request_id: string
 }
 
+type QCApiValidationErrorData =  {
+   loc: {
+     path: string
+   }
+   msg: string,
+   type: string
+}
+
+export type QCApiErrorData = Array<QCApiValidationErrorData> | string
+
 export type QCApiResponse<T=any> = {
-    data: T, 
+    data: T,
     meta: QCApiResponseMeta
 }
 
@@ -44,7 +71,7 @@ export class QCApiCollectionObj<T=any> {
 
     constructor(
         objectClass:  new (...args: any[]) => T,
-        data: QCApiCollection<T> 
+        data: QCApiCollection<T>
     ) {
 
         this.collection = data.collection;
@@ -63,114 +90,119 @@ export class QCApiCollectionObj<T=any> {
 @Service()
 export class ApiService {
 
-    private apiURL = environment.apiUrl;
-    private http = inject(HttpClient); 
+    private readonly apiURL = environment.apiUrl;
+    private readonly http = inject(HttpClient);
 
 
-    public getObject<T>(                                            
+    public getObject<T>(
       type: new (...args: any[]) => T,
-      path: string, 
+      path: string,
       options?: HttpClientCommonOptions
-    ): Observable<QCApiResponse<T>>  {                                                                  
+    ): Observable<QCApiResponse<T>>  {
 
-        return this.get<T>(path, options )                                      
-            .pipe(                                                        
-                switchMap(  resp => {                                       
-               
-                   resp.data = new type(resp.data); 
+        return this.get<T>(path, options )
+            .pipe(
+                switchMap(  resp => {
+
+                   resp.data = new type(resp.data);
 
                    return of(resp)
-                }),                                                         
-                first(),                                                    
-            )                                                              
-    }                                                                    
+                }),
+                first(),
+            )
+    }
 
 
-    public getCollection<T>(                                            
-      type: new (...args: any[]) => T,
-      path: string, 
-      options?: HttpClientCommonOptions
-    ): Observable<QCApiResponse<QCApiCollectionObj<T>>>  {                                                                  
+    public getCollection<T>(
+        type: new (...args: any[]) => T,
+        path: string,
+        options?: HttpClientCommonOptions
+    ): Observable<QCApiResponse<QCApiCollectionObj<T>>>  {
 
-        return this.get<QCApiCollectionObj<T>>(path, options )                                      
-            .pipe(                                                        
-                switchMap(  resp => {                                       
+        return this.get<QCApiCollectionObj<T>>(path, options )
+            .pipe(
+                switchMap(  resp => {
                    resp.data = Object.assign(new QCApiCollectionObj<T>(type,resp.data) )
 
                    return of(resp)
-                }),                                                         
-                first(),                                                    
-            )                                                              
-    }                                                                    
+                }),
+                first(),
+            )
+    }
+
 
     get<T>(
-      path: string, 
-      options?: HttpClientCommonOptions
+        path: string,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.get<QCApiResponse<T>>, path, options )
     }
 
+
     post<T>(
-      path: string, 
-      body: any, 
-      options?: HttpClientCommonOptions
+        path: string,
+        body: any,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.post<QCApiResponse<T>>, path, body, options )
     }
 
+
     put<T>(
-      path: string, 
-      body: any, 
-      options?: HttpClientCommonOptions
+        path: string,
+        body: any,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.put<QCApiResponse<T>>, path, body, options )
     }
 
+
     delete<T>(
-      path: string, 
-      options?: HttpClientCommonOptions 
+        path: string,
+        options?: HttpClientCommonOptions
     ): Observable<QCApiResponse<T>> {
 
         return this.request( this.http.delete<QCApiResponse<T>>, path, options )
     }
 
-    request<T>( 
-      requestFunc: QCRequestFunc<T>,  
-      path: string,
-      ...args: any[]
+
+    request<T>(
+        requestFunc: QCRequestFunc<T>,
+        path: string,
+        ...args: any[]
     ): Observable<T> {
 
         const url = sprintf('%s%s', this.apiURL, path )
 
         return requestFunc.bind(this.http)(url, args[0], ...args.slice(1, args.length ) )
             .pipe(
-                catchError( (error: HttpErrorResponse): Observable<T> => {                
+                catchError( (error: HttpErrorResponse): Observable<T> => {
 
                     console.error('request url', url)
                     console.error('request args', args)
 
                     if (error.error instanceof ErrorEvent) {
-                      console.error('Client-side error:', error.error.message);
+                        console.error('Client-side error:', error.error.message);
                     } else {
-                      console.error(`Backend returned code ${error.status}, body was: ${error.error}`);
+                        console.error(`Backend returned code ${error.status}, body was: ${error.error}`);
                     }
-                                             
-                    return throwError( () => error )                                  
-                }),                                                                 
+
+                    return throwError( () => error )
+                }),
                 first(),
                 tap( (response) => {
 
                     if (!environment.production)  {
                         console.log('request url', url)
                         console.log('request args', args)
-                        console.log('response data', response) 
+                        console.log('response data', response)
                     }
                 })
             )
-     
+
     }
 }
 

@@ -5,6 +5,18 @@
   scrollbar-gutter: stable;
 }
 
+.topic-list-title {
+  padding-left: 0.5em;
+  min-width: 0;
+  overflow: hidden;
+  flex-grow: 1 !important;
+  width: 100%;
+}
+
+.topic-list-notification {
+    color: #00d38d
+}
+
 svg {
   flex: none;
 }

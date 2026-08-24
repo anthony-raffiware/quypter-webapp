@@ -1,5 +1,5 @@
 <div class="d-none">
-    <!-- hidden element for thumbnail generation --> 
+    <!-- hidden element for thumbnail generation -->
     <canvas #canvasContainer></canvas>
 </div>
 <div class="qc-image-dialog-box">
@@ -11,19 +11,19 @@
       <mat-label>Favorite Animal</mat-label>
     -->
 
-      <input 
-         hidden=true 
-         type="file" 
-         class="file-input" 
-         (change)="onFileSelected($event)" 
+      <input
+         hidden=true
+         type="file"
+         class="file-input"
+         (change)="onFileSelected($event)"
          (cancel)="onFileSelectCancel($event)"
          #fileUpload>
       @if ( imageData() ) {
         <div class="d-flex flex-row justify-content-center">
-            <img [src]="safeImageData()" alt="Image" />
+            <img [src]="thumbData()" alt="Image" />
         </div>
         <div class="d-flex flex-row justify-content-center">
-            {{ imageName() }} 
+            {{ imageName() }}
         </div>
         <div class="d-flex flex-row justify-content-center">
             {{ imageSize() | bytesDisplay }}
@@ -36,7 +36,7 @@
         </div>
         <div class="d-flex flex-row justify-content-end">
           <div class="ms-2">
-             <button mat-mini-fab 
+             <button mat-mini-fab
                class="delete-button"
                (click)="onClearImage()"
              >
@@ -45,14 +45,14 @@
           </div>
 
         </div>
-      }  
+      }
       @else {
         <div class="file-upload d-flex flex-row justify-content-end">
-      
+
           <div class="d-flex flex-column justify-content-center">
               <div>
               @if (loadingImage()) {
-                Loading.... 
+                Loading....
               }
               @else if (imageError()) {
                 {{ imageError() }}
@@ -61,27 +61,34 @@
                 "No file uploaded yet
               }
              </div>
-          </div> 
+          </div>
           <div class="ms-2">
-             <button mat-mini-fab 
+             <button mat-mini-fab
                matSuffix
-               color="primary" 
+               color="primary"
                class="upload-btn"
                (click)="onClick(fileUpload)"
+               cdkFocusInitial
              >
-                 <mat-icon>attach_file</mat-icon>
+                <mat-icon>attach_file</mat-icon>
              </button>
           </div>
-        </div> 
+        </div>
       }
     <!--
     </mat-form-field>
-     --> 
+     -->
   </mat-dialog-content>
   <mat-dialog-actions>
     <mat-button-toggle-group [disabled]="loadingImage()">
       <button matButton (click)="onNoClick()">Cancel</button>
-      <button matButton [mat-dialog-close]="returnData()" cdkFocusInitial>Send</button>
+        <button
+           matButton
+           [mat-dialog-close]="returnData()"
+           [disabled]="disableSendButton()"
+        >
+        Send
+        </button>
     </mat-button-toggle-group>
   </mat-dialog-actions>
 </div>

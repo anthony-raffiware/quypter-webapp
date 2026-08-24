@@ -5,8 +5,35 @@ services:
       context: ..
       target: build
       dockerfile: docker/Dockerfile
+      args:
+        BASE_HREF: /
+        API_URL: '/api'
     volumes:
-      - ./dist:/app/dist
+      - ../dist:/app/dist
       # Don't write modules back to host
       - /app/node_modules
-    command: ["ng", "build", "--configuration=production", "--output-path=/app/dist"]
+    command: [
+      '/bin/sh',
+      '-c',
+      # Preserve directories so nginx root doesn't break
+      'find /app/dist/ -type f -delete; cp -R /app/build/* /app/dist/'
+    ]
+
+  demo-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        BASE_HREF: /
+        API_URL: '/api'
+    ports:
+      - "8080:80"
+      - "8443:443"
+    networks:
+      - qc-backend
+
+
+networks:
+  qc-backend:
+    external: true
+    name: quick-crypt-backend_qc_backend

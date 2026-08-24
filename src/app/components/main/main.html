@@ -1,33 +1,28 @@
+<app-app-error></app-app-error>
 <div class="row gc-main">
-   <!--
-  <div class="row mx-0 flex-fill px-0">
-  -->
-     <div class="col-3 d-flex flex-column px-0">
-       <div class="row flex-fill  px-3 mx-0">
-         <div class="col-12 d-flex flex-column px-0">
-           <div class="row mx-0 px-0">
-               <div class="col-12 px-0">
-                  <app-side-nav [tabPanel]="tabPanel"> </app-side-nav>
-               </div>
-           </div>
-           <div class="row flex-fill mx-0">
-             <div class="col-12 px-0"  style="height: calc(100vh - 150px);" >
-                <mat-tab-nav-panel #tabPanel style="display:block;height:inherit;">
-                  <router-outlet name="select-list"></router-outlet>
-                </mat-tab-nav-panel>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>
-     <div class="col-9 d-flex flex-column  px-0">
-       <div class="row flex-fill  px-3 mx-0 h-100">
-         <div class="col-12 d-flex flex-column px-0">
-            <router-outlet></router-outlet>    
-         </div>
-       </div>
-     </div>
-  <!--
-  </div>
-  -->
+    <div class="col-3 d-flex flex-column px-0">
+        <div class="row flex-fill  px-3 mx-0">
+            <div class="col-12 d-flex flex-column px-0">
+                <div class="row mx-0 px-0">
+                    <div class="col-12 px-0">
+                        <app-side-nav [tabPanel]="tabPanel"> </app-side-nav>
+                    </div>
+                </div>
+                <div class="row flex-fill mx-0">
+                    <div class="col-12 select-list-container px-0">
+                        <mat-tab-nav-panel #tabPanel>
+                          <router-outlet name="select-list"></router-outlet>
+                        </mat-tab-nav-panel>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-9 d-flex flex-column  px-0">
+        <div class="row flex-fill  px-3 mx-0 h-100">
+            <div class="col-12 d-flex flex-column px-0">
+               <router-outlet></router-outlet>
+            </div>
+        </div>
+    </div>
 </div>

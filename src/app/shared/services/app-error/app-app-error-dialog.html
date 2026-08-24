@@ -1,0 +1,17 @@
+<div class="error-container">
+    <h3 mat-dialog-title>
+        {{ error().header }}
+        @if ( error().requestId ) {
+            Id: {{ error().requestId }}
+        }
+    </h3>
+    <mat-dialog-content>
+        @if ( error().code ) {
+            {{ error().code }}:
+        }
+        {{ error().msg }}
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button matButton mat-dialog-close>Close</button>
+    </mat-dialog-actions>
+</div>

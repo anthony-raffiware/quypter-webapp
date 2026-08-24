@@ -1,54 +1,86 @@
-import { Service, inject, signal, Signal } from '@angular/core';
+import { Service, inject, signal, Signal, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { ApiService, QCApiResponse } from './api';
 import { LocalStorageService } from './local-storage';
-import { catchError, throwError } from 'rxjs';
 import { sprintf } from 'sprintf-js';
-import { 
-    from, 
-    switchMap, 
-    pipe, 
-    Observable, 
-    BehaviorSubject, 
+import {
+    from,
+    switchMap,
+    pipe,
+    Observable,
+    BehaviorSubject,
     filter,
-    first
+    first,
+    catchError,
+    throwError
 } from 'rxjs';
 
 import { NewSession, Session } from '../models/session.model';
-import { createEd25519Keys, exportKeyEncoded } from '../utils';
+import {
+    createEd25519Keys,
+    exportKeyEncoded,
+    loadPrivateKey,
+    signTokens,
+    getUtc,
+    genNonce
+} from '../utils';
+import { AppErrorService } from './app-error/app-error.service';
 
 
-export type SessionData = {                       
-  id?: string, 
-  key_id?: string,               
-  session_priv_key?: string,               
-  session_pub_key?:  string,               
+export type SessionData = {
+  id?: string,
+  key_id?: string,
+  session_priv_key?: string,
+  session_pub_key?:  string,
   created_ts?: string,
-}                                                      
+}
 
+
+@Service()
+export class SessionDataService {
+
+    private readonly storageService  = inject(LocalStorageService);
+
+    public loadLocalSessionData(): SessionData | undefined {
+
+        return this.storageService.getSerializedData('session_data') as SessionData
+    }
+
+
+    public saveLocalSessionData(sessionData: SessionData): void {
+        this.storageService.saveSerializedData('session_data', sessionData)
+    }
+
+
+    public clearLocalSessionData(): void {
+        this.storageService.removeData('session_data')
+    }
+}
 
 @Service()
 export class SessionService {
 
-    private apiService = inject(ApiService);
-    private storageService = inject(LocalStorageService);
+    private readonly apiService      = inject(ApiService);
+    //private readonly storageService  = inject(LocalStorageService);
+    private readonly dataService     = inject(SessionDataService);
+    private readonly appErrorService = inject(AppErrorService);
+
     private sessionData:  SessionData = {};
 
-    sessionLoaded$: BehaviorSubject<boolean> ;
-    session$: BehaviorSubject<SessionData>;
-    session: Signal<SessionData>;
+    readonly sessionLoaded$: BehaviorSubject<boolean> ;
+    readonly session$: BehaviorSubject<SessionData>;
+    readonly session: Signal<SessionData>;
 
-    constructor() { 
-        console.log('session init')
+
+    constructor() {
+
         this.sessionLoaded$ = new BehaviorSubject<boolean>(false);
-        this.session$ = new BehaviorSubject<SessionData>({});
+        this.session$       = new BehaviorSubject<SessionData>({});
 
-        this.session = toSignal(this.session$, { 
-          //initialValue: {}, 
-          requireSync: true 
+        this.session = toSignal(this.session$, {
+            requireSync: true
         });
-
 
         this.loadOrCreateSession()
     }
@@ -62,14 +94,16 @@ export class SessionService {
             this.checkSession( sessionData.id as string )
                 .subscribe({
                     next: (response) => {
-                       this.sessionData = sessionData;
 
-                       this.sessionLoaded$.next(true);
-                       this.session$.next(sessionData);
-                       console.log('found session') 
+                        console.log('found session')
+
+                        this.sessionData = sessionData;
+
+                        this.sessionLoaded$.next(true);
+                        this.session$.next(sessionData);
                     },
                     error: (error: HttpErrorResponse) => {
-                        console.log('session error');
+                        this.appErrorService.setApiError(error)
                     }
                 })
 
@@ -84,12 +118,13 @@ export class SessionService {
        return this.sessionLoaded$.pipe( filter( loaded => loaded ), first() );
     }
 
+
     get sessionId() {
-         return  this.sessionData.id as string  
+         return this.sessionData.id as string
     }
 
     get sessionKeyId() {
-         return  this.sessionData.key_id as string  
+         return this.sessionData.key_id as string
     }
 
     get sessionPubKey(): string {
@@ -97,8 +132,9 @@ export class SessionService {
     }
 
     get sessionPrivKey(): string {
-         return this.sessionData.session_priv_key as string   
+         return this.sessionData.session_priv_key as string
     }
+
     private createAndSetSession(): void {
 
         from( this.createSession() )
@@ -107,14 +143,21 @@ export class SessionService {
                    return responseOb
                 })
             )
-            .subscribe( (response) => {
-                this.sessionData.id = response.data.id
-                this.sessionData.key_id = response.data.key_id
-                this.sessionData.created_ts = response.data.key_id
+            .subscribe({
+                next:  (response) => {
+                    this.sessionData.id = response.data.id
+                    this.sessionData.key_id = response.data.key_id
+                    this.sessionData.created_ts = response.data.key_id
 
-                this.sessionLoaded$.next(true);
+                    this.saveLocalSessionData()
 
-                this.saveLocalSessionData()
+                    this.sessionLoaded$.next(true);
+                    this.session$.next(this.sessionData)
+
+                },
+                error: (error) => {
+                    this.appErrorService.setApiError(error)
+                }
             });
 
     }
@@ -125,7 +168,7 @@ export class SessionService {
         const { publicKey, privateKey } = await createEd25519Keys();
 
         this.sessionData.session_priv_key = await exportKeyEncoded(privateKey)
-        this.sessionData.session_pub_key = await exportKeyEncoded(publicKey)
+        this.sessionData.session_pub_key  = await exportKeyEncoded(publicKey)
 
         const newSession: NewSession = {
            pub_key: this.sessionData.session_pub_key
@@ -142,31 +185,32 @@ export class SessionService {
         return this.apiService.get<Session>(sprintf('/session/%s', sessionId ))
             .pipe(
               catchError((error: HttpErrorResponse) => {
-                
+
                  if (error.status === 404) {
                    console.error('Session not found');
                    this.clearLocalSessionData()
                    this.createAndSetSession()
-                 } 
-                
+                 }
+
                  return throwError(() => error );
               })
             );
     }
 
     private loadLocalSessionData(): SessionData | undefined {
-        
-        return this.storageService.getSerializedData('session_data') as SessionData
+
+        return this.dataService.loadLocalSessionData()
     }
 
 
     private saveLocalSessionData(): void {
-        this.storageService.saveSerializedData('session_data', this.sessionData)
+        this.dataService.saveLocalSessionData(this.sessionData)
     }
 
 
     private clearLocalSessionData(): void {
-        this.storageService.removeData('session_data')
+
+        this.dataService.clearLocalSessionData()
         this.sessionData = {}
     }
 

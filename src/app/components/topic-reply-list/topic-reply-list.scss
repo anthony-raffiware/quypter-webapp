@@ -8,6 +8,7 @@
   //min-width: 100%;
   //max-width: 100%;
   flex-grow: 1;
+  margin-right: 0px;
 
   font-size: 18px !important;
 }
@@ -36,7 +37,7 @@
   height: inherit;
   flex: 1; /* Take up remaining space */
   min-height: 0;
-  overflow-y: auto; 
+  overflow-y: auto;
   scrollbar-gutter: stable;
 
   // position: relative;

@@ -1,8 +1,8 @@
-import { 
-    localizeDateTime, 
-    eceDecrypt, 
+import {
+    localizeDateTime,
+    eceDecrypt,
     eceEncrypt,
-    genNonce, 
+    genNonce,
     getUtc,
     signTokens,
 } from "../utils"
@@ -12,7 +12,7 @@ import { ReplyComment } from "./reply-comment.model";
 
 export type TopicReplyData = {
     type: string,
-    data: MessageReply | ImageReply 
+    data: MessageReply | ImageReply
 }
 
 export type MessageReply = {
@@ -26,18 +26,18 @@ enum ImageFormats {
 }
 
 export type ImageReply = {
-    name:    string, 
-    type:    string, 
-    data:    string, 
-    thumb:   string,
-    caption: string,
-    size:    number 
+    name:     string,
+    type:     string,
+    data:     string,
+    thumb:    string,
+    caption?: string,
+    size:     number
 }
 
-export type SigData = {                       
+export type SigData = {
   signature: string,
-  date: string,
-  nonce: string 
+  date:      string,
+  nonce:     string
 }
 
 export class NewTopicReply {
@@ -48,12 +48,16 @@ export class NewTopicReply {
     public data!: TopicReplyData | string;
 
 
-    constructor(params: Partial<TopicReply> = {}) {
+    constructor(
+        params: Partial<TopicReply> = {}
+    ) {
         Object.assign(this, params);
     }
 
 
-    public async encryptData(secret: string): Promise<void> {
+    public async encryptData(
+        secret: string
+    ): Promise<void> {
 
         if ( typeof this.data !== 'object' ) {
            return
@@ -65,14 +69,17 @@ export class NewTopicReply {
     }
 
 
-    public async signReplyKey(sessionId: string, privKey: CryptoKey) {
+    public async signReplyKey(
+        sessionId: string,
+        privKey: CryptoKey
+    ) {
 
         if ( this.topic_reply_pub_key === undefined ) {
-            return         
+            return
         }
 
         const nowUtc = getUtc()
-        const nonce  = genNonce() 
+        const nonce  = genNonce()
         const tokens = {
             sessionId: sessionId,
             pubKey: this.topic_reply_pub_key,
@@ -81,10 +88,10 @@ export class NewTopicReply {
         }
         const signature = await signTokens(tokens, privKey)
 
-        const sigData: SigData = {                       
-          signature: signature,
-          date:  nowUtc,
-          nonce: nonce 
+        const sigData: SigData = {
+            signature: signature,
+            date:  nowUtc,
+            nonce: nonce
         }
 
         this.topic_reply_pub_key_sig = base64url.encode(JSON.stringify(sigData))
@@ -105,7 +112,10 @@ export class TopicReply {
     public expires_ts?: string;
     public comment: ReplyComment | undefined;
 
-    constructor(params: Partial<TopicReply> = {}) {
+    constructor(
+        params: Partial<TopicReply> = {}
+    ) {
+
         Object.assign(this, params);
 
         if (this.comment) {
@@ -133,7 +143,9 @@ export class TopicReply {
         return this.decryptedData?.data as ImageReply
     }
 
-    public async decryptData(secret: string): Promise<TopicReplyData> {
+    public async decryptData(
+        secret: string
+    ): Promise<TopicReplyData> {
 
         if ( typeof this.data === 'object' ) {
            console.log('already decrypted')
@@ -141,14 +153,14 @@ export class TopicReply {
         }
 
         const data =  await eceDecrypt(this.data, secret)
-   
+
         this.decryptedData = JSON.parse( data ) as TopicReplyData
 
         if (this.comment) {
             await this.comment.decryptData(secret)
         }
 
-        return this.decryptedData 
+        return this.decryptedData
     }
 
 }

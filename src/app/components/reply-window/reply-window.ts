@@ -1,24 +1,30 @@
-import { Component, input, effect, signal, inject, computed, model } from '@angular/core';
 import {
-  FormGroup,
-  FormBuilder,
-  FormControl,
-  FormGroupDirective,
-  NgForm,
-  Validators,
-  FormsModule,
-  ReactiveFormsModule,
+    Component,
+    input,
+    effect,
+    signal,
+    inject,
+    computed,
+    model
+} from '@angular/core';
+import { HttpErrorResponse, } from '@angular/common/http';
+import {
+    FormGroup,
+    FormBuilder,
+    Validators,
+    FormsModule,
+    ReactiveFormsModule,
 } from '@angular/forms';
-import {ErrorStateMatcher} from '@angular/material/core';
+
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatDialog } from '@angular/material/dialog';
 
-import { toSignal, toObservable, rxResource } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { filter, first, switchMap, forkJoin, of, from } from 'rxjs';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { switchMap, of, from, catchError, Observable, throwError } from 'rxjs';
+
 import { TopicService } from '../../shared/services/topic';
 import { SessionService } from '../../shared/services/session';
 import { Topic, TopicWithReplies } from '../../shared/models/topic.model';
@@ -28,6 +34,7 @@ import { TopicReplyData, ImageReply } from '../../shared/models/topic-reply.mode
 import { AddReplyImage } from '../add-reply-image/add-reply-image';
 import { ImageView } from '../image-view/image-view';
 import { TopicReplyList } from '../topic-reply-list/topic-reply-list';
+import { AppErrorService } from '../../shared/services/app-error/app-error.service';
 
 export type TopicReplies = Array<TopicReplyData>
 
@@ -35,86 +42,91 @@ export type TopicReplies = Array<TopicReplyData>
 @Component({
   selector: 'app-reply-window',
   imports: [
-    FormsModule, 
-    MatButtonModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
-    ReactiveFormsModule,
-    MatCardModule,
-    TopicReplyList
+      FormsModule,
+      MatButtonModule,
+      MatFormFieldModule,
+      MatInputModule,
+      ReactiveFormsModule,
+      MatCardModule,
+      TopicReplyList
   ],
   templateUrl: './reply-window.html',
   styleUrl: './reply-window.scss',
 })
 export class ReplyWindow {
 
-    public sessionService = inject(SessionService);
-    public topicService   = inject(TopicService);
-    public topicUuid      = input.required<string>();
-    public dialog       = inject(MatDialog);
+    private readonly sessionService  = inject(SessionService);
+    private readonly topicService    = inject(TopicService);
+    private readonly dialog          = inject(MatDialog);
+    private readonly appErrorService = inject(AppErrorService);
 
-    public sessionId        = computed(() => this.sessionService.session().id );
-    public topic            = signal<TopicWithReplies|null>(null);
-    public decryptedReplies = signal<Array<TopicReply>>([]);
-    public loadingReplies   = signal<boolean>(false)
+    readonly topicUuid = input.required<string>();
 
-    public imageData = signal<string>('');
-    public imageType = model<string>();
+    readonly topic            = signal<TopicWithReplies|null>(null);
+    readonly decryptedReplies = signal<Array<TopicReply>>([]);
+    readonly loadingReplies   = signal<boolean>(false)
+    readonly imageData        = signal<string>('');
+    readonly imageType        = model<string>();
+    readonly sessionId        = computed(() => this.sessionService.session().id );
 
+    readonly messageReplyForm!: FormGroup;
+    readonly matcher = new QCErrorStateMatcher();
 
-    messageReplyForm!: FormGroup;
-    matcher = new QCErrorStateMatcher();
-
-    private replyLimit  = signal<number>(5);
-    private replyLastId = signal<string|null>(null);
-    private replyLastTs = signal<string|null>(null);
-
-    topicResource = rxResource({
-        params: () => ({ 
-            sessionId: this.sessionId() as string,
+    private readonly replyLimit    = signal<number>(5);
+    private readonly replyLastId   = signal<string|null>(null);
+    private readonly replyLastTs   = signal<string|null>(null);
+    private readonly topicResource = rxResource({
+        params: () => ({
+            sessionId: this.sessionId(),
             topicId: this.topicUuid(),
             replyLimit: this.replyLimit(),
             replyLastId: this.replyLastId(),
             replyLastTs: this.replyLastTs()
         }),
-        stream: ({ params }) => { 
+        stream: ({ params }) => {
 
             if (!params.sessionId) {
-              return of(undefined);
+                return of(undefined);
             }
 
             this.loadingReplies.set(true)
 
-            const hasCursor = params.replyLastId && params.replyLastTs; 
+            const hasCursor = params.replyLastId && params.replyLastTs;
 
             const options = {
-                params: { 
+                params: {
                     limit: params.replyLimit,
-                    ...(hasCursor && { 
+                    ...(hasCursor && {
                     key_id: params.replyLastId as string,
-                    key_ts: params.replyLastTs as string 
+                    key_ts: params.replyLastTs as string
                     })
                 }
             }
 
-
             return this.topicService.fetchTopicWithSentReplies(
-                params.sessionId, 
-                params.topicId, 
-                options ) 
+                    params.sessionId,
+                    params.topicId,
+                    options
+                )
+                .pipe(
+                    catchError( (error: HttpErrorResponse): Observable<any> => {
+                        this.appErrorService.setApiError(error)
+
+                        return throwError( () => error )
+
+                    })
+                )
+
         }
     });
 
     get mrf(): FormGroup { return this.messageReplyForm; }
 
 
-    constructor(
-        private route: ActivatedRoute,
-        private router: Router
-    ) {
+    constructor() {
 
         this.messageReplyForm = new FormBuilder().group({
-          messageData: ['', [Validators.required ] ],
+            messageData: ['', [Validators.required]],
         });
 
         effect( () => {
@@ -123,9 +135,9 @@ export class ReplyWindow {
 
             if ( this.topic() && ( this.topicUuid() != this.topic()?.id ) ) {
                 this.decryptedReplies.set([])
-                this.replyLimit.set(5) 
-                this.replyLastId.set(null) 
-                this.replyLastTs.set(null)                 
+                this.replyLimit.set(5)
+                this.replyLastId.set(null)
+                this.replyLastTs.set(null)
             }
         })
 
@@ -134,8 +146,6 @@ export class ReplyWindow {
             const topicReplies = this.topicResource.value();
 
             if ( topicReplies !== undefined ) {
-
-                console.log(this.topicResource.value())
 
                 this.topic.set(topicReplies.data as TopicWithReplies)
 
@@ -150,56 +160,57 @@ export class ReplyWindow {
                 })
 
                 Promise.all(promises as Promise<TopicReply>[] ).then((decrypted) => {
-                    
-                    this.decryptedReplies.update( results => { 
-                       return [...results, ...decrypted]; 
-                    })
 
+                    this.decryptedReplies.update( results => {
+                       return [...results, ...decrypted];
+                    })
                 })
             }
         })
 
     }
 
-    handleEndOfScroll(event: Event ): void {
-        console.log('in parent', event) 
+    handleEndOfScroll(
+        event: Event
+    ): void {
 
         const last = this.decryptedReplies().at(-1);
 
         if ( last !== undefined ) {
-            this.replyLimit.set(3) 
-            this.replyLastId.set(last.id) 
-            this.replyLastTs.set(last.created_ts)                 
+            this.replyLimit.set(3)
+            this.replyLastId.set(last.id)
+            this.replyLastTs.set(last.created_ts)
         }
 
     }
 
-    openAddImageDialog(event: Event ): void {
+    openAddImageDialog(
+        event: Event
+    ): void {
 
         event.preventDefault();
-
-        //console.log('bb', this.imageData())
 
         const dialogRef = this.dialog.open(AddReplyImage, {
           data: { imageData: this.imageData(), imageType: this.imageType() },
         });
 
         dialogRef.afterClosed().subscribe(result => {
-          
+
             if (result !== undefined) {
-              //console.log(result)
-              //this.imageData.set(result);
-              this.addReplyImage(result)
+                this.addReplyImage(result)
             }
         });
     }
 
-    openViewImageDialog( imageReply: ImageReply, event: Event): void {
+    openViewImageDialog(
+        imageReply: ImageReply,
+        event: Event
+    ): void {
 
         const imageDialogRef = this.dialog.open(ImageView, {
-          data: { imageData: imageReply.data },
-          width: '100%', // Ensures the container uses the available width
-          maxWidth: '100%' // Opt
+            data: { imageData: imageReply.data },
+            width: '100%',
+            maxWidth: '100%'
         });
 
     }
@@ -207,7 +218,7 @@ export class ReplyWindow {
     onMessageSubmit() {
 
         if (this.mrf.invalid || this.topic() === null ) {
-           return;
+            return;
         }
 
         const formVals = this.mrf.value;
@@ -222,48 +233,51 @@ export class ReplyWindow {
         this.addTopicReply(replyData);
     }
 
-    addReplyImage( replyImage: ImageReply ) {
-        console.log(replyImage)
+    addReplyImage(
+        replyImage: ImageReply
+    ) {
 
         const replyData: TopicReplyData = {
             type: 'image',
-            data: replyImage        
+            data: replyImage
         }
 
         this.addTopicReply(replyData);
     }
 
-    addTopicReply(replyData: TopicReplyData) {
+    addTopicReply(
+        replyData: TopicReplyData
+    ) {
 
         const newTopicReply = new NewTopicReply();
-        newTopicReply.data = replyData; 
+        newTopicReply.data = replyData;
 
         this.sessionService.isSessionLoaded()
             .pipe(
                 switchMap( (loaded) => {
-                    console.log(loaded)
+
                     const topic = this.topic() as Topic;
 
                     newTopicReply.session_key_id = this.sessionService.sessionKeyId as string
 
-                    return from(this.topicService.createTopicReply(topic, newTopicReply))  
-                        .pipe( switchMap( (s) => { return s }))
+                    return from(this.topicService.createTopicReply(topic, newTopicReply))
+                           .pipe( switchMap( (s) => { return s }))
                 })
             )
             .subscribe({
                 next: (replyResp) => {
-                    console.log(replyResp) 
+
                     this.mrf.markAsUntouched();
                     this.mrf.setErrors(null);
                     this.mrf.reset()
                     this.mrf.get('messageData')?.setErrors(null);
                     this.decryptedReplies.set([])
-                    this.replyLastId.set(null) 
-                    this.replyLastTs.set(null)                 
+                    this.replyLastId.set(null)
+                    this.replyLastTs.set(null)
                     this.topicResource.reload()
                 },
                 error: (error) => {
-                    console.error('Topics Request failed', error);
+                    this.appErrorService.setApiError(error)
                 }
             })
 

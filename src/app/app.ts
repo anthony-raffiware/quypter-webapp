@@ -6,13 +6,13 @@ import { Footer } from './components/footer/footer';
 @Component({
   selector: 'app-root',
   imports: [
-    RouterOutlet, 
-    Header, 
+    RouterOutlet,
+    Header,
     Footer,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('quick-crypt-webapp');
+  protected readonly title = signal('quypter-webapp');
 }

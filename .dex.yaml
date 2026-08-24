@@ -1,0 +1,25 @@
+# https://github.com/symkat/dex
+version: 2
+
+blocks:
+
+  - name: build-dist
+    desc: Build production app in dist/
+    commands:
+      - exec: docker compose -f docker/docker-compose.yml build --build-arg BASE_HREF=/quypter/ --build-arg API_URL=https://dev.raffiware.io/qc/api/v1 angular-build
+      - exec: docker compose -f docker/docker-compose.yml run --rm angular-build
+
+  - name: start-demo-server
+    desc: Start web app server on port 8443
+    commands:
+      - exec: docker compose -f docker/docker-compose.yml up -d demo-server
+
+  - name: stop-demo-server
+    desc: Stop web app server
+    commands:
+      - exec: docker compose -f docker/docker-compose.yml down demo-server
+
+  - name: build-demo-server
+    desc: Rebuild demo server container before running
+    commands:
+      - exec: docker compose -f docker/docker-compose.yml up -d --remove-orphans --force-recreate --build demo-server
